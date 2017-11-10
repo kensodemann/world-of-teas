@@ -1,7 +1,5 @@
 'use strict';
 
-const pg = require('pg');
-
 module.exports = (app, pool) => {
   app.get('/api/tea-categories', (req, res) => {
     (async () => {
@@ -14,4 +12,4 @@ module.exports = (app, pool) => {
       }
     })().catch(e => console.log(e.stack));
   });
-}
+};
