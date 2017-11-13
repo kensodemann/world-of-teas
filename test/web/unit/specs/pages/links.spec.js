@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import HelloWorld from '@/components/HelloWorld';
+import Page from '@/components/pages/links';
 
-describe('HelloWorld.vue', () => {
+describe('links.vue', () => {
   it('should render correct contents', () => {
-    const Constructor = Vue.extend(HelloWorld);
+    const Constructor = Vue.extend(Page);
     const vm = new Constructor().$mount();
     expect(vm.$el.querySelector('.hello h1').textContent)
       .to.equal('Welcome to Your Vue.js App');
