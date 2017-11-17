@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h1>I like to browse by Category</h1>
+  <div class="browse-by-category">
+    <h1>I Like to Browse by Category</h1>
     <div>A list of categories will eventually be here</div>
   </div>
 </template>

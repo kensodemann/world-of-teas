@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="header">
 <!-- TODO: These should really be components -->
   <a href="#/">Home</a>
   <a href="#/categories">Categories</a>
