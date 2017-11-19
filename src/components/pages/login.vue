@@ -5,5 +5,19 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    this.$http.get('/api/tea-categories').then(
+      response => {
+        console.log(response);
+      },
+      err => {
+        console.log(err);
+      }
+    );
+    return {
+      msg: 42
+    };
+  }
+};
 </script>
