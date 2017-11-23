@@ -4,10 +4,10 @@ const MockClient = require('./mock-client');
 
 module.exports = class MockPool {
   constructor() {
-    this._client = new MockClient();
+    this.test_client = new MockClient();
   }
 
   connect() {
-    return Promise.resolve(this._client);
+    return Promise.resolve(this.test_client);
   }
 };

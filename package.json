@@ -6,27 +6,36 @@
   "private": true,
   "watch": {
     "lint": {
-      "patterns": ["server", "src", "test/web/unit/specs", "test/server"],
+      "patterns": [
+        "server",
+        "src",
+        "test/web/unit/specs",
+        "test/server"
+      ],
       "extensions": "js,jsx,vue"
     },
     "unitsrv": {
-      "patterns": ["server", "test/server"],
+      "patterns": [
+        "server",
+        "test/server"
+      ],
       "extensions": "js"
     },
     "unitweb": {
-      "patterns": ["src", "test/web/unit/specs"],
+      "patterns": [
+        "src",
+        "test/web/unit/specs"
+      ],
       "extensions": "js,jsx,vue"
     }
   },
   "scripts": {
-    "dev":
-      "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "e2e": "node test/e2e/runner.js",
     "start": "node index.js",
     "build": "node build/build.js",
     "unitsrv": "mocha test/server/**/*.spec.js",
-    "unitweb":
-      "cross-env BABEL_ENV=test karma start test/web/unit/karma.conf.js --single-run",
+    "unitweb": "cross-env BABEL_ENV=test karma start test/web/unit/karma.conf.js --single-run",
     "test": "npm run lint && npm run unitweb && npm run unitsrv",
     "lint": "eslint --ext .js,.jsx,.vue server src test/web/unit/specs test/server",
     "heroku-postbuild": "npm run build",
@@ -99,6 +108,7 @@
     "supertest": "^3.0.0",
     "url-loader": "^0.5.8",
     "vue-loader": "^13.0.4",
+    "vue-resource-mock": "0.0.6",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.4.2",
     "webpack": "^3.6.0",
@@ -110,5 +120,9 @@
     "node": "^8.6.0",
     "npm": "^5.5.0"
   },
-  "browserslist": ["> 1%", "last 2 versions", "not ie <= 8"]
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
 }
