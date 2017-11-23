@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const MockClient = require("./mock-client");
+const MockClient = require('./mock-client');
 
 module.exports = class MockPool {
   constructor() {

@@ -36,12 +36,41 @@ npm run unitsrv
 npm run unitweb
 npm test
 
+# run unit (server and UI) and lint, watch for changes
+npn run watch
+
 # run e2e tests
 npm run e2e
 
 # build for production and view the bundle analyzer report
 npm run build --report
 ```
+
+## Common Development Setup
+
+The most common setup for development:
+
+```bash
+# In terminal 1
+heroku local web
+
+# In terminal 2
+npm run dev
+
+#In VSCode terminal
+npm run watch
+```
+
+This enables hot reloading of the code and hot re-running of lint and the unit tests as things change.
+
+Before final commit, squash, and PR submittion, rerun all the tests as a final safty check:
+
+- `npm test`
+- `npm run e2e`
+
+**Note:** e2e tests are not run as part of the watch so be especially sure to make sure they still work and are up to date for whatever modifications have been made to the UI.
+
+## links
 
 For a detailed explanation on how things work, check out the following documentation:
 

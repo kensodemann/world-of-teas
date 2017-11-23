@@ -1,6 +1,5 @@
 'use strict';
 
-const client = require('./mocks/mock-client');
 const expect = require('chai').expect;
 const express = require('express');
 const MockPool = require('./mocks/mock-pool');
@@ -52,7 +51,9 @@ describe('/api/tea-categories', function() {
         .get('/api/tea-categories')
         .end(function(err, res) {
           expect(pool._client.query.calledOnce).to.be.true;
-          expect(pool._client.query.calledWith('select * from tea_categories')).to.be.true;
+          expect(
+            pool._client.query.calledWith('select * from tea_categories')
+          ).to.be.true;
           done();
         });
     });
