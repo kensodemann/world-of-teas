@@ -6,7 +6,7 @@ To create the database on a local machine:
 1. create a role named `ken`
 1. create a database named `worldofteas`
 1. cd into this directory
-1. `psql postgres://ken:ken@localhost/worldoftea`
+1. `psql postgres://ken:ken@localhost/worldoftea` (to update the production database `heroku pg:psql`)
 1. `worldofteas=> \i install.sql`
 
 That should create all tables without error and populate the default data.
