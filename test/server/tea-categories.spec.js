@@ -14,9 +14,8 @@ describe('/api/tea-categories', function() {
   beforeEach(function() {
     app = express();
     pool = new MockPool();
-    require('../../server/tea-categories')(app, pool);
     testData = [
-      {
+      ({
         id: 1,
         name: 'Green',
         description: 'Non - oxidized, mild tea'
@@ -30,8 +29,9 @@ describe('/api/tea-categories', function() {
         id: 3,
         name: 'Herbal',
         description: 'Not a tea'
-      }
+      })
     ];
+    require('../../server/tea-categories')(app, pool);
   });
 
   describe('get', function() {
@@ -46,21 +46,21 @@ describe('/api/tea-categories', function() {
     });
 
     it('queries the tea categories', function(done) {
-      sinon.spy(pool._client, 'query');
+      sinon.spy(pool.test_client, 'query');
       request(app)
         .get('/api/tea-categories')
         .end(function(err, res) {
-          expect(pool._client.query.calledOnce).to.be.true;
+          expect(pool.test_client.query.calledOnce).to.be.true;
           expect(
-            pool._client.query.calledWith('select * from tea_categories')
+            pool.test_client.query.calledWith('select * from tea_categories')
           ).to.be.true;
           done();
         });
     });
 
     it('returns the data', function(done) {
-      sinon.stub(pool._client, 'query');
-      pool._client.query.returns(Promise.resolve({ rows: testData }));
+      sinon.stub(pool.test_client, 'query');
+      pool.test_client.query.returns(Promise.resolve({ rows: testData }));
       request(app)
         .get('/api/tea-categories')
         .end(function(err, res) {
@@ -71,11 +71,11 @@ describe('/api/tea-categories', function() {
     });
 
     it('releases the client', function(done) {
-      sinon.spy(pool._client, 'release');
+      sinon.spy(pool.test_client, 'release');
       request(app)
         .get('/api/tea-categories')
         .end(function(err, res) {
-          expect(pool._client.release.calledOnce).to.be.true;
+          expect(pool.test_client.release.calledOnce).to.be.true;
           done();
         });
     });
