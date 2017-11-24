@@ -6,7 +6,7 @@ import VueResourceMock from 'vue-resource-mock';
 import App from './App';
 import router from './router';
 
-import testDataService from './assets/test-data/mock-data-service';
+import testDataService from './assets/test-data/data-service';
 
 Vue.config.productionTip = false;
 
