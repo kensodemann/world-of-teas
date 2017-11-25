@@ -1,12 +1,16 @@
 <template>
-  <div class="footer">This is the footer</div>
+  <div class="footer">
+    <div class="footer-title">World of Teas</div>
+    <div class="footer-copyright">Copyright &copy; 2017 - Kenneth W. Sodemann</div>
+  </div>
 </template>
 
 <script>
-export default {
-};
+export default {};
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.footer {
+  text-align: center;
+}
 </style>
