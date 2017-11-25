@@ -21,7 +21,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../scss/theme.scss";
+
 .footer {
   text-align: center;
+  color: $secondary-text-color;
+  font-size: smaller;
 }
 </style>
