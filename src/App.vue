@@ -20,6 +20,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import "./scss/theme.scss";
+
 html,
 body,
 #app {
@@ -35,7 +37,7 @@ body {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+  color: $text-color;
   display: flex;
   flex-direction: column;
 }
@@ -49,6 +51,8 @@ body {
   flex: 1 1 auto;
   position: relative; /* need this to position inner content */
   overflow-y: auto;
+  margin-left: $standard-spacing;
+  margin-right: $standard-spacing;
 }
 
 #main-footer {

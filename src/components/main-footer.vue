@@ -25,7 +25,7 @@ export default {
 
 .footer {
   text-align: center;
-  color: $secondary-text-color;
+  color: $primary;
   font-size: smaller;
 }
 </style>
