@@ -1,1 +1,11 @@
-$secondary-text-color: #a0a0a0;
+@import "./colors";
+
+$text-color: $color-black;
+$secondary-text-color: $color-gray;
+
+$primary: $color-primary-0;
+$complement: $color-complement-3;
+$secondary: $color-secondary-1-2;
+$secondary-highlight: $color-secondary-1-1;
+
+$standard-spacing: 12px;
