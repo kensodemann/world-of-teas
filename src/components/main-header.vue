@@ -17,7 +17,7 @@ export default {};
 </script>
 
 <style lang="scss" scoped>
-@import '../scss/theme.scss';
+@import '../scss/theme';
 
 .header {
   display: flex;
