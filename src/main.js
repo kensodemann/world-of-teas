@@ -23,5 +23,3 @@ Vue.use(VueResource);
 if (process.env.NODE_ENV === 'testing') {
   Vue.use(VueResourceMock, testDataService);
 }
-
-console.log('from main: ', process.env.NODE_ENV);
