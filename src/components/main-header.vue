@@ -1,13 +1,13 @@
 <template>
 <div class="header">
   <div class="items nav-items">
-    <a href="#/">Home</a>
-    <a href="#/categories">Categories</a>
-    <a href="#/ratings">Ratings</a>
-    <a href="#/links">Links</a>
+    <a href="#/" v-bind:class="{active: $route.name === 'Home'}">Home</a>
+    <a href="#/categories" v-bind:class="{active: $route.name === 'Categories'}">Categories</a>
+    <a href="#/ratings" v-bind:class="{active: $route.name === 'Ratings'}">Ratings</a>
+    <a href="#/links" v-bind:class="{active: $route.name === 'Links'}">Links</a>
   </div>
   <div class="items admin-items">
-    <a href="#/login">Login</a>
+    <a href="#/login" v-bind:class="{active: $route.name === 'Login'}">Login</a>
   </div>
 </div>
 </template>
@@ -50,6 +50,7 @@ export default {};
     outline: 0;
     color: $secondary;
 
+    &.active,
     &:hover,
     &:active,
     &:focus {
