@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = class TeaCategoriesService {
+module.exports = class TeaCategories {
   constructor(pool) {
     this._pool = pool;
   }
