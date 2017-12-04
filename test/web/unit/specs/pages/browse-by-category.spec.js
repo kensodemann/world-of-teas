@@ -7,7 +7,7 @@ import testDataService from '@/assets/test-data/data-service';
 import testTeaCategories from '@/assets/test-data/tea-categories';
 
 Vue.use(VueResource);
-Vue.use(VueResourceMock, testDataService);
+Vue.use(VueResourceMock, testDataService, { silent: true });
 
 describe('browse-by-category.vue', () => {
   let vm;
