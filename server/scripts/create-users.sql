@@ -14,3 +14,18 @@ CREATE TABLE IF NOT EXISTS user_credentials (
   SALT TEXT NOT NULL,
   CONSTRAINT user_credentials_pk PRIMARY KEY (USER_RID)
 );
+
+DROP TRIGGER IF EXISTS bir_users ON users;
+DROP FUNCTION IF EXISTS bir_users();
+
+CREATE FUNCTION bir_users() RETURNS trigger as $bir_users$
+BEGIN
+  IF NEW.id IS NULL THEN
+    NEW.id := nextval('user_id_sequence');
+  END IF;
+  RETURN NEW;
+END;
+$bir_users$ LANGUAGE plpgsql;
+
+CREATE TRIGGER bir_users BEFORE INSERT ON users
+    FOR EACH ROW EXECUTE PROCEDURE bir_users();

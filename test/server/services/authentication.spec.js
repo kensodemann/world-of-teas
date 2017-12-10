@@ -17,6 +17,8 @@ describe('service: authentication', function() {
 
   class MockResponse {
     send(opt) {}
+    status(s) {}
+    end() {}
   }
   let mockResponse;
 
@@ -317,10 +319,164 @@ describe('service: authentication', function() {
         id: 1138,
         first_name: 'Ted',
         last_name: 'Senspeck',
+        roles: ['admin', 'user'],
         iat: 'whatever',
         exp: 19930124509912485
       });
       expect(service.isAuthenticated(mockRequest)).to.be.true;
+    });
+  });
+
+  describe('requireApiLogin', function() {
+    let service;
+    let mockNext;
+    beforeEach(function() {
+      const Service = proxyquire('../../../server/services/authentication', {
+        jsonwebtoken: mockJWT
+      });
+      service = new Service();
+
+      mockRequest.headers = {
+        authorization: 'bearer thisisarandomtokenvalue'
+      };
+      process.env.JWT_PRIVATE_KEY = 'IAmAFakeCertificateForRefresh';
+      sinon.stub(mockJWT, 'verify');
+      sinon.stub(mockResponse, 'send');
+      sinon.stub(mockResponse, 'status');
+      sinon.stub(mockResponse, 'end');
+      mockNext = sinon.stub();
+    });
+
+    it('goes on to next if the user is logged in', function() {
+      mockJWT.verify.returns({
+        id: 1138,
+        first_name: 'Ted',
+        last_name: 'Senspeck',
+        roles: ['admin', 'user'],
+        iat: 'whatever',
+        exp: 19930124509912485
+      });
+      service.requireApiLogin(mockRequest, mockResponse, mockNext);
+      expect(mockNext.calledOnce).to.be.true;
+      expect(mockResponse.send.called).to.be.false;
+      expect(mockResponse.status.called).to.be.false;
+      expect(mockResponse.end.called).to.be.false;
+    });
+
+    it('sends a 401 if the user is not logged in', function() {
+      mockJWT.verify.throws(new Error('bad wolf'));
+      service.requireApiLogin(mockRequest, mockResponse, mockNext);
+      expect(mockNext.called).to.be.false;
+      expect(mockResponse.status.calledOnce).to.be.true;
+      expect(mockResponse.status.calledWith(401)).to.be.true;
+      expect(mockResponse.end.calledOnce).to.be.true;
+    });
+  });
+
+  describe('requireRole', function() {
+    let service;
+    let mockNext;
+    beforeEach(function() {
+      const Service = proxyquire('../../../server/services/authentication', {
+        jsonwebtoken: mockJWT
+      });
+      service = new Service();
+
+      mockRequest.headers = {
+        authorization: 'bearer thisisarandomtokenvalue'
+      };
+      process.env.JWT_PRIVATE_KEY = 'IAmAFakeCertificateForRefresh';
+      sinon.stub(mockJWT, 'verify');
+      mockJWT.verify.returns({
+        id: 1138,
+        first_name: 'Ted',
+        last_name: 'Senspeck',
+        roles: ['admin', 'user'],
+        iat: 'whatever',
+        exp: 19930124509912485
+      });
+      sinon.stub(mockResponse, 'send');
+      sinon.stub(mockResponse, 'status');
+      sinon.stub(mockResponse, 'end');
+      mockNext = sinon.stub();
+    });
+
+    it('goes on to next if the user is in the specified role', function() {
+      service.requireRole('admin')(mockRequest, mockResponse, mockNext);
+      expect(mockNext.calledOnce).to.be.true;
+      expect(mockResponse.send.called).to.be.false;
+      expect(mockResponse.status.called).to.be.false;
+      expect(mockResponse.end.called).to.be.false;
+    });
+
+    it('sends a 403 if the user is not in the specified role', function() {
+      service.requireRole('bogus')(mockRequest, mockResponse, mockNext);
+      expect(mockNext.called).to.be.false;
+      expect(mockResponse.status.calledOnce).to.be.true;
+      expect(mockResponse.status.calledWith(403)).to.be.true;
+      expect(mockResponse.end.calledOnce).to.be.true;
+    });
+  });
+
+  describe('requireRoleOrId', function() {
+    let service;
+    let mockNext;
+    beforeEach(function() {
+      const Service = proxyquire('../../../server/services/authentication', {
+        jsonwebtoken: mockJWT
+      });
+      service = new Service();
+
+      mockRequest.headers = {
+        authorization: 'bearer thisisarandomtokenvalue'
+      };
+      process.env.JWT_PRIVATE_KEY = 'IAmAFakeCertificateForRefresh';
+      sinon.stub(mockJWT, 'verify');
+      mockJWT.verify.returns({
+        id: 1138,
+        first_name: 'Ted',
+        last_name: 'Senspeck',
+        roles: ['admin', 'user'],
+        iat: 'whatever',
+        exp: 19930124509912485
+      });
+      sinon.stub(mockResponse, 'send');
+      sinon.stub(mockResponse, 'status');
+      sinon.stub(mockResponse, 'end');
+      mockNext = sinon.stub();
+    });
+
+    it('goes on to next if the user is in the specified role', function() {
+      mockRequest.params = {
+        id: '4298'
+      };
+      service.requireRoleOrId('admin')(mockRequest, mockResponse, mockNext);
+      expect(mockNext.calledOnce).to.be.true;
+      expect(mockResponse.send.called).to.be.false;
+      expect(mockResponse.status.called).to.be.false;
+      expect(mockResponse.end.called).to.be.false;
+    });
+
+    it('goes on to next if the user id matches the specified id', function() {
+      mockRequest.params = {
+        id: '1138'
+      };
+      service.requireRoleOrId('bogus')(mockRequest, mockResponse, mockNext);
+      expect(mockNext.calledOnce).to.be.true;
+      expect(mockResponse.send.called).to.be.false;
+      expect(mockResponse.status.called).to.be.false;
+      expect(mockResponse.end.called).to.be.false;
+    });
+
+    it('sends a 403 if the ids do not match and the user is not in the specified role', function() {
+      mockRequest.params = {
+        id: '42'
+      };
+      service.requireRoleOrId('bogus')(mockRequest, mockResponse, mockNext);
+      expect(mockNext.called).to.be.false;
+      expect(mockResponse.status.calledOnce).to.be.true;
+      expect(mockResponse.status.calledWith(403)).to.be.true;
+      expect(mockResponse.end.calledOnce).to.be.true;
     });
   });
 });

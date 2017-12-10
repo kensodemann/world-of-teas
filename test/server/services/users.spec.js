@@ -6,11 +6,11 @@ const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 const Servce = require('../../../server/services/users');
 
-describe('service: users', function() {
+describe('service: users', () => {
   let pool;
   let testData;
 
-  beforeEach(function() {
+  beforeEach(() => {
     pool = new MockPool();
     testData = [
       {
@@ -28,20 +28,20 @@ describe('service: users', function() {
     ];
   });
 
-  describe('getAll', function() {
+  describe('getAll', () => {
     let service;
 
-    beforeEach(function() {
+    beforeEach(() => {
       service = new Servce(pool);
     });
 
-    it('connects to the pool', function() {
+    it('connects to the pool', () => {
       sinon.spy(pool, 'connect');
       service.getAll();
       expect(pool.connect.calledOnce).to.be.true;
     });
 
-    it('queries the users', async function() {
+    it('queries the users', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.getAll();
       expect(pool.test_client.query.calledOnce).to.be.true;
@@ -49,34 +49,34 @@ describe('service: users', function() {
         .true;
     });
 
-    it('resolves the data', async function() {
+    it('resolves the data', async () => {
       sinon.stub(pool.test_client, 'query');
       pool.test_client.query.returns(Promise.resolve({ rows: testData }));
       const data = await service.getAll();
       expect(data).to.deep.equal(testData);
     });
 
-    it('releases the client', async function() {
+    it('releases the client', async () => {
       sinon.spy(pool.test_client, 'release');
       await service.getAll();
       expect(pool.test_client.release.calledOnce).to.be.true;
     });
   });
 
-  describe('get', function() {
+  describe('get', () => {
     let service;
 
-    beforeEach(function() {
+    beforeEach(() => {
       service = new Servce(pool);
     });
 
-    it('connects to the pool', function() {
+    it('connects to the pool', () => {
       sinon.spy(pool, 'connect');
       service.get(42);
       expect(pool.connect.calledOnce).to.be.true;
     });
 
-    it('queries the users for the user with the given ID', async function() {
+    it('queries the users for the user with the given ID', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.get(42);
       expect(pool.test_client.query.calledOnce).to.be.true;
@@ -87,7 +87,7 @@ describe('service: users', function() {
       ).to.be.true;
     });
 
-    it('queries the users for the user with the given ID string', async function() {
+    it('queries the users for the user with the given ID string', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.get('42');
       expect(pool.test_client.query.calledOnce).to.be.true;
@@ -98,7 +98,7 @@ describe('service: users', function() {
       ).to.be.true;
     });
 
-    it('queries the users by email if the passed id has an "@" sign', async function() {
+    it('queries the users by email if the passed id has an "@" sign', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.get('42@1138.73');
       expect(pool.test_client.query.calledOnce).to.be.true;
@@ -110,7 +110,7 @@ describe('service: users', function() {
       ).to.be.true;
     });
 
-    it('resolves the data', async function() {
+    it('resolves the data', async () => {
       sinon.stub(pool.test_client, 'query');
       pool.test_client.query.returns(
         Promise.resolve({
@@ -129,28 +129,152 @@ describe('service: users', function() {
         id: 42,
         first_name: 'Ford',
         last_name: 'Prefect',
-        email: 'universe.traveler@compuserve.net'
+        email: 'universe.traveler@compuserve.net',
+        roles: ['admin', 'user']
       });
     });
 
-    it('resolves undefined if not found', async function() {
+    it('resolves undefined if not found', async () => {
       sinon.stub(pool.test_client, 'query');
       pool.test_client.query.returns(Promise.resolve({ rows: [] }));
       const data = await service.get(42);
       expect(data).to.be.undefined;
     });
 
-    it('releases the client', async function() {
+    it('releases the client', async () => {
       sinon.spy(pool.test_client, 'release');
       await service.get(42);
       expect(pool.test_client.release.calledOnce).to.be.true;
     });
   });
 
-  describe('password is valid', function() {
+  describe('save', () => {
     let service;
 
-    beforeEach(function() {
+    beforeEach(() => {
+      service = new Servce(pool);
+    });
+
+    it('connects to the pool', async () => {
+      sinon.spy(pool, 'connect');
+      await service.save({
+        first_name: 'Tess',
+        last_name: 'McTesterson'
+      });
+      expect(pool.connect.calledOnce).to.be.true;
+    });
+
+    describe('a user with an ID', () => {
+      it('updates the existing user', async () => {
+        sinon.spy(pool.test_client, 'query');
+        await service.save({
+          id: 4273,
+          first_name: 'Tess',
+          last_name: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+        expect(pool.test_client.query.calledOnce).to.be.true;
+        const sql = pool.test_client.query.args[0][0];
+        expect(/^update users.*where id = \$1 returning \*/.test(sql)).to.be
+          .true;
+      });
+
+      it('resolves the updated user', async () => {
+        sinon.stub(pool.test_client, 'query');
+        pool.test_client.query.returns(
+          Promise.resolve({
+            rows: [
+              {
+                id: 4273,
+                first_name: 'Tess',
+                last_name: 'McTesterson',
+                email: 'tess@test.ly'
+              }
+            ]
+          })
+        );
+        const user = await service.save({
+          id: 4273,
+          first_name: 'Tess',
+          last_name: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+        expect(user).to.deep.equal({
+          id: 4273,
+          first_name: 'Tess',
+          last_name: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+      });
+
+      it('resolves empty if there was no user to update', async () => {
+        sinon.stub(pool.test_client, 'query');
+        pool.test_client.query.returns(Promise.resolve({ rows: [] }));
+        const user = await service.save({
+          id: 4273,
+          first_name: 'Tess',
+          last_name: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+        expect(user).to.be.undefined;
+      });
+    });
+
+    describe('a user without an ID', () => {
+      it('creates a new user', async () => {
+        sinon.spy(pool.test_client, 'query');
+        await service.save({
+          first_name: 'Tess',
+          last_name: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+        expect(pool.test_client.query.calledOnce).to.be.true;
+        const sql = pool.test_client.query.args[0][0];
+        expect(/^insert into users.*returning \*/.test(sql)).to.be.true;
+      });
+
+      it('resolves the inserted user', async () => {
+        sinon.stub(pool.test_client, 'query');
+        pool.test_client.query.returns(
+          Promise.resolve({
+            rows: [
+              {
+                id: 4273,
+                first_name: 'Tess',
+                last_name: 'McTesterson',
+                email: 'tess@test.ly'
+              }
+            ]
+          })
+        );
+        const user = await service.save({
+          first_name: 'Tess',
+          last_name: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+        expect(user).to.deep.equal({
+          id: 4273,
+          first_name: 'Tess',
+          last_name: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+      });
+    });
+
+    it('releases the client', async () => {
+      sinon.spy(pool.test_client, 'release');
+      await service.save({
+        first_name: 'Tess',
+        last_name: 'McTesterson'
+      });
+      expect(pool.test_client.release.calledOnce).to.be.true;
+    });
+  });
+
+  describe('password is valid', () => {
+    let service;
+
+    beforeEach(() => {
       const mockEncryption = {
         hash: sinon.stub()
       };
@@ -163,13 +287,13 @@ describe('service: users', function() {
       service = new ProxiedService(pool);
     });
 
-    it('connects to the pool', function() {
+    it('connects to the pool', () => {
       sinon.spy(pool, 'connect');
       service.passwordMatches(42, 'shhhhhIam$ecret');
       expect(pool.connect.calledOnce).to.be.true;
     });
 
-    it('queries the user credentials', async function() {
+    it('queries the user credentials', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.passwordMatches(42, 'IamPassw0rd');
       expect(pool.test_client.query.calledOnce).to.be.true;
@@ -181,14 +305,14 @@ describe('service: users', function() {
       ).to.be.true;
     });
 
-    it('resolves false if the user has no credentials record', async function() {
+    it('resolves false if the user has no credentials record', async () => {
       sinon.stub(pool.test_client, 'query');
       pool.test_client.query.returns(Promise.resolve({ rows: [] }));
       const match = await service.passwordMatches(42, 'IamPassw0rd');
       expect(match).to.be.false;
     });
 
-    it('resolves false if the password hashes do not match', async function() {
+    it('resolves false if the password hashes do not match', async () => {
       sinon.stub(pool.test_client, 'query');
       pool.test_client.query.returns(
         Promise.resolve({
@@ -199,7 +323,7 @@ describe('service: users', function() {
       expect(match).to.be.false;
     });
 
-    it('resolves true if the password hashes do match', async function() {
+    it('resolves true if the password hashes do match', async () => {
       sinon.stub(pool.test_client, 'query');
       pool.test_client.query.returns(
         Promise.resolve({
@@ -210,7 +334,7 @@ describe('service: users', function() {
       expect(match).to.be.true;
     });
 
-    it('releases the client', async function() {
+    it('releases the client', async () => {
       sinon.spy(pool.test_client, 'release');
       await service.passwordMatches(73, 'coop3r');
       expect(pool.test_client.release.calledOnce).to.be.true;
