@@ -51,6 +51,30 @@ module.exports = class AuthenticationService {
     }
   }
 
+  requireRole(role) {
+    return (req, res, next) => {
+      const user = this._verifyToken(req);
+      if (user.roles.find(r => r === role)) {
+        next();
+      } else {
+        res.status(403);
+        res.end();
+      }
+    };
+  }
+
+  requireRoleOrId(role) {
+    return (req, res, next) => {
+      const user = this._verifyToken(req);
+      if (user.id.toString() === req.params.id || user.roles.find(r => r === role)) {
+        next();
+      } else {
+        res.status(403);
+        res.end();
+      }
+    };
+  }
+
   isAuthenticated(req) {
     try {
       this._verifyToken(req);

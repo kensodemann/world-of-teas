@@ -18,6 +18,7 @@ describe('route: /api/tea-categories', function() {
 
   beforeEach(function() {
     app = express();
+    require('../../../server/config/express')(app);
     const pool = new MockPool();
     testData = [
       {
