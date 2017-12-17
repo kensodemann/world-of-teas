@@ -15,14 +15,14 @@ describe('service: users', () => {
     testData = [
       {
         id: 1,
-        first_name: 'Kenneth',
-        last_name: 'Sodemann',
+        firstName: 'Kenneth',
+        lastName: 'Sodemann',
         email: 'not.my.real.email@gmail.com'
       },
       {
         id: 2,
-        first_name: 'Lisa',
-        last_name: 'Buerger',
+        firstName: 'Lisa',
+        lastName: 'Buerger',
         email: 'another.fake.email@aol.com'
       }
     ];
@@ -45,8 +45,8 @@ describe('service: users', () => {
       sinon.spy(pool.test_client, 'query');
       await service.getAll();
       expect(pool.test_client.query.calledOnce).to.be.true;
-      expect(pool.test_client.query.calledWith('select * from users')).to.be
-        .true;
+      const sql = pool.test_client.query.args[0][0];
+      expect(/select .* from users/.test(sql)).to.be.true;
     });
 
     it('resolves the data', async () => {
@@ -80,34 +80,27 @@ describe('service: users', () => {
       sinon.spy(pool.test_client, 'query');
       await service.get(42);
       expect(pool.test_client.query.calledOnce).to.be.true;
-      expect(
-        pool.test_client.query.calledWith('select * from users where id = $1', [
-          42
-        ])
-      ).to.be.true;
+      const args = pool.test_client.query.args[0];
+      expect(/select .* from users where id = \$1/.test(args[0])).to.be.true;
+      expect(args[1]).to.deep.equal([42]);
     });
 
     it('queries the users for the user with the given ID string', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.get('42');
       expect(pool.test_client.query.calledOnce).to.be.true;
-      expect(
-        pool.test_client.query.calledWith('select * from users where id = $1', [
-          '42'
-        ])
-      ).to.be.true;
+      const args = pool.test_client.query.args[0];
+      expect(/select .* from users where id = \$1/.test(args[0])).to.be.true;
+      expect(args[1]).to.deep.equal(['42']);
     });
 
     it('queries the users by email if the passed id has an "@" sign', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.get('42@1138.73');
       expect(pool.test_client.query.calledOnce).to.be.true;
-      expect(
-        pool.test_client.query.calledWith(
-          'select * from users where upper(email) = upper($1)',
-          ['42@1138.73']
-        )
-      ).to.be.true;
+      const args = pool.test_client.query.args[0];
+      expect(/select .* from users where upper\(email\) = upper\(\$1\)/.test(args[0])).to.be.true;
+      expect(args[1]).to.deep.equal(['42@1138.73']);
     });
 
     it('resolves the data', async () => {
@@ -117,8 +110,8 @@ describe('service: users', () => {
           rows: [
             {
               id: 42,
-              first_name: 'Ford',
-              last_name: 'Prefect',
+              firstName: 'Ford',
+              lastName: 'Prefect',
               email: 'universe.traveler@compuserve.net'
             }
           ]
@@ -127,8 +120,8 @@ describe('service: users', () => {
       const data = await service.get(42);
       expect(data).to.deep.equal({
         id: 42,
-        first_name: 'Ford',
-        last_name: 'Prefect',
+        firstName: 'Ford',
+        lastName: 'Prefect',
         email: 'universe.traveler@compuserve.net',
         roles: ['admin', 'user']
       });
@@ -158,8 +151,8 @@ describe('service: users', () => {
     it('connects to the pool', async () => {
       sinon.spy(pool, 'connect');
       await service.save({
-        first_name: 'Tess',
-        last_name: 'McTesterson'
+        firstName: 'Tess',
+        lastName: 'McTesterson'
       });
       expect(pool.connect.calledOnce).to.be.true;
     });
@@ -169,8 +162,8 @@ describe('service: users', () => {
         sinon.spy(pool.test_client, 'query');
         await service.save({
           id: 4273,
-          first_name: 'Tess',
-          last_name: 'McTesterson',
+          firstName: 'Tess',
+          lastName: 'McTesterson',
           email: 'tess@test.ly'
         });
         expect(pool.test_client.query.calledOnce).to.be.true;
@@ -186,8 +179,8 @@ describe('service: users', () => {
             rows: [
               {
                 id: 4273,
-                first_name: 'Tess',
-                last_name: 'McTesterson',
+                firstName: 'Tess',
+                lastName: 'McTesterson',
                 email: 'tess@test.ly'
               }
             ]
@@ -195,14 +188,14 @@ describe('service: users', () => {
         );
         const user = await service.save({
           id: 4273,
-          first_name: 'Tess',
-          last_name: 'McTesterson',
+          firstName: 'Tess',
+          lastName: 'McTesterson',
           email: 'tess@test.ly'
         });
         expect(user).to.deep.equal({
           id: 4273,
-          first_name: 'Tess',
-          last_name: 'McTesterson',
+          firstName: 'Tess',
+          lastName: 'McTesterson',
           email: 'tess@test.ly'
         });
       });
@@ -212,8 +205,8 @@ describe('service: users', () => {
         pool.test_client.query.returns(Promise.resolve({ rows: [] }));
         const user = await service.save({
           id: 4273,
-          first_name: 'Tess',
-          last_name: 'McTesterson',
+          firstName: 'Tess',
+          lastName: 'McTesterson',
           email: 'tess@test.ly'
         });
         expect(user).to.be.undefined;
@@ -224,8 +217,8 @@ describe('service: users', () => {
       it('creates a new user', async () => {
         sinon.spy(pool.test_client, 'query');
         await service.save({
-          first_name: 'Tess',
-          last_name: 'McTesterson',
+          firstName: 'Tess',
+          lastName: 'McTesterson',
           email: 'tess@test.ly'
         });
         expect(pool.test_client.query.calledOnce).to.be.true;
@@ -240,22 +233,22 @@ describe('service: users', () => {
             rows: [
               {
                 id: 4273,
-                first_name: 'Tess',
-                last_name: 'McTesterson',
+                firstName: 'Tess',
+                lastName: 'McTesterson',
                 email: 'tess@test.ly'
               }
             ]
           })
         );
         const user = await service.save({
-          first_name: 'Tess',
-          last_name: 'McTesterson',
+          firstName: 'Tess',
+          lastName: 'McTesterson',
           email: 'tess@test.ly'
         });
         expect(user).to.deep.equal({
           id: 4273,
-          first_name: 'Tess',
-          last_name: 'McTesterson',
+          firstName: 'Tess',
+          lastName: 'McTesterson',
           email: 'tess@test.ly'
         });
       });
@@ -264,8 +257,8 @@ describe('service: users', () => {
     it('releases the client', async () => {
       sinon.spy(pool.test_client, 'release');
       await service.save({
-        first_name: 'Tess',
-        last_name: 'McTesterson'
+        firstName: 'Tess',
+        lastName: 'McTesterson'
       });
       expect(pool.test_client.release.calledOnce).to.be.true;
     });

@@ -44,8 +44,8 @@ describe('route: /api/users', function() {
     sinon.stub(mockJWT, 'verify');
     mockJWT.verify.returns({
       id: 1138,
-      first_name: 'Ted',
-      last_name: 'Senspeck',
+      firstName: 'Ted',
+      lastName: 'Senspeck',
       roles: ['admin'],
       iat: 'whatever',
       exp: 19930124509912485
@@ -58,23 +58,23 @@ describe('route: /api/users', function() {
     testData = [
       {
         id: 10,
-        first_name: 'Fred',
-        last_name: 'Flintstone'
+        firstName: 'Fred',
+        lastName: 'Flintstone'
       },
       {
         id: 20,
-        first_name: 'Wilma',
-        last_name: 'Flintstone'
+        firstName: 'Wilma',
+        lastName: 'Flintstone'
       },
       {
         id: 30,
-        first_name: 'Barney',
-        last_name: 'Rubble'
+        firstName: 'Barney',
+        lastName: 'Rubble'
       },
       {
         id: 40,
-        first_name: 'Betty',
-        last_name: 'Rubble'
+        firstName: 'Betty',
+        lastName: 'Rubble'
       }
     ];
     proxyquire('../../../server/routes/users', {
@@ -123,8 +123,8 @@ describe('route: /api/users', function() {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 30,
-              first_name: 'Barney',
-              last_name: 'Rubble'
+              firstName: 'Barney',
+              lastName: 'Rubble'
             });
             done();
           });
@@ -133,8 +133,8 @@ describe('route: /api/users', function() {
       it('returns the data if the ids match', function(done) {
         mockJWT.verify.returns({
           id: 30,
-          first_name: 'Barney',
-          last_name: 'Rubble',
+          firstName: 'Barney',
+          lastName: 'Rubble',
           roles: ['user'],
           iat: 'whatever',
           exp: 19930124509912485
@@ -145,8 +145,8 @@ describe('route: /api/users', function() {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 30,
-              first_name: 'Barney',
-              last_name: 'Rubble'
+              firstName: 'Barney',
+              lastName: 'Rubble'
             });
             done();
           });
@@ -155,8 +155,8 @@ describe('route: /api/users', function() {
       it('returns 403 if user not admin and ids do not match', function(done) {
         mockJWT.verify.returns({
           id: 10,
-          first_name: 'Fred',
-          last_name: 'Flintstone',
+          firstName: 'Fred',
+          lastName: 'Flintstone',
           roles: ['user'],
           iat: 'whatever',
           exp: 19930124509912485
@@ -194,8 +194,8 @@ describe('route: /api/users', function() {
           .post('/api/users/30')
           .send({
             id: 30,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
@@ -210,16 +210,16 @@ describe('route: /api/users', function() {
           .post('/api/users/30')
           .send({
             id: 30,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               id: 30,
-              first_name: 'Barney',
-              last_name: 'Rubble',
+              firstName: 'Barney',
+              lastName: 'Rubble',
               email: 'barney@rubble.kings.io'
             });
             done();
@@ -229,8 +229,8 @@ describe('route: /api/users', function() {
       it('calls the save if own user', done => {
         mockJWT.verify.returns({
           id: 30,
-          first_name: 'Barney',
-          last_name: 'Rubble',
+          firstName: 'Barney',
+          lastName: 'Rubble',
           roles: ['user'],
           iat: 'whatever',
           exp: 19930124509912485
@@ -239,16 +239,16 @@ describe('route: /api/users', function() {
           .post('/api/users/30')
           .send({
             id: 30,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               id: 30,
-              first_name: 'Barney',
-              last_name: 'Rubble',
+              firstName: 'Barney',
+              lastName: 'Rubble',
               email: 'barney@rubble.kings.io'
             });
             done();
@@ -260,16 +260,16 @@ describe('route: /api/users', function() {
           .post('/api/users/30')
           .send({
             id: 30,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 30,
-              first_name: 'Barney',
-              last_name: 'Rubble',
+              firstName: 'Barney',
+              lastName: 'Rubble',
               email: 'barney@rubble.kings.io'
             });
             done();
@@ -281,16 +281,16 @@ describe('route: /api/users', function() {
           .post('/api/users/30')
           .send({
             id: 42,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               id: 30,
-              first_name: 'Barney',
-              last_name: 'Rubble',
+              firstName: 'Barney',
+              lastName: 'Rubble',
               email: 'barney@rubble.kings.io'
             });
             done();
@@ -302,8 +302,8 @@ describe('route: /api/users', function() {
           .post('/api/users/42')
           .send({
             id: 42,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
@@ -316,8 +316,8 @@ describe('route: /api/users', function() {
       it('returns 403 if not admin and not own user', done => {
         mockJWT.verify.returns({
           id: 10,
-          first_name: 'Fred',
-          last_name: 'Flintstone',
+          firstName: 'Fred',
+          lastName: 'Flintstone',
           roles: ['user'],
           iat: 'whatever',
           exp: 19930124509912485
@@ -326,8 +326,8 @@ describe('route: /api/users', function() {
           .post('/api/users/42')
           .send({
             id: 42,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
@@ -344,8 +344,8 @@ describe('route: /api/users', function() {
         request(app)
           .post('/api/users')
           .send({
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
@@ -359,15 +359,15 @@ describe('route: /api/users', function() {
         request(app)
           .post('/api/users')
           .send({
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
-              first_name: 'Barney',
-              last_name: 'Rubble',
+              firstName: 'Barney',
+              lastName: 'Rubble',
               email: 'barney@rubble.kings.io'
             });
             done();
@@ -378,16 +378,16 @@ describe('route: /api/users', function() {
         request(app)
           .post('/api/users')
           .send({
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 314159,
-              first_name: 'Barney',
-              last_name: 'Rubble',
+              firstName: 'Barney',
+              lastName: 'Rubble',
               email: 'barney@rubble.kings.io'
             });
             done();
@@ -399,15 +399,15 @@ describe('route: /api/users', function() {
           .post('/api/users')
           .send({
             id: 42,
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
-              first_name: 'Barney',
-              last_name: 'Rubble',
+              firstName: 'Barney',
+              lastName: 'Rubble',
               email: 'barney@rubble.kings.io'
             });
             done();
@@ -417,8 +417,8 @@ describe('route: /api/users', function() {
       it('returns 403 if not admin', done => {
         mockJWT.verify.returns({
           id: 10,
-          first_name: 'Fred',
-          last_name: 'Flintstone',
+          firstName: 'Fred',
+          lastName: 'Flintstone',
           roles: ['user'],
           iat: 'whatever',
           exp: 19930124509912485
@@ -426,8 +426,8 @@ describe('route: /api/users', function() {
         request(app)
           .post('/api/users')
           .send({
-            first_name: 'Barney',
-            last_name: 'Rubble',
+            firstName: 'Barney',
+            lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
           .end(function(err, res) {

@@ -2,6 +2,8 @@
 
 const encryption = require('./encryption');
 
+const columns = 'id, first_name as "firstName", last_name as "lastName", email';
+
 module.exports = class Users {
   constructor(pool) {
     this._pool = pool;
@@ -9,7 +11,7 @@ module.exports = class Users {
 
   async getAll() {
     const client = await this._pool.connect();
-    const data = await client.query('select * from users');
+    const data = await client.query(`select ${columns} from users`);
     client.release();
     return data.rows;
   }
@@ -17,8 +19,8 @@ module.exports = class Users {
   async get(id) {
     const client = await this._pool.connect();
     const data = await (/.*@.*/.test(id)
-      ? client.query('select * from users where upper(email) = upper($1)', [id])
-      : client.query('select * from users where id = $1', [id]));
+      ? client.query(`select ${columns} from users where upper(email) = upper($1)`, [id])
+      : client.query(`select ${columns} from users where id = $1`, [id]));
     client.release();
     const user = data.rows && data.rows[0];
     if (user) {
@@ -33,12 +35,12 @@ module.exports = class Users {
     if (user.id) {
       rtn = await client.query(
         'update users set first_name = $2, last_name = $3, email = $4 where id = $1 returning *',
-        [user.id, user.first_name, user.last_name, user.email]
+        [user.id, user.firstName, user.lastName, user.email]
       );
     } else {
       rtn = await client.query(
         'insert into users(first_name, last_name, email) values($1, $2, $3) returning *',
-        [user.first_name, user.last_name, user.email]
+        [user.firstName, user.lastName, user.email]
       );
     }
     client.release();
