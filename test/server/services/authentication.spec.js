@@ -96,14 +96,14 @@ describe('service: authentication', function() {
         service.authenticate(mockRequest, mockResponse, p => {});
         mockPassport.callback(null, {
           id: 42,
-          first_name: 'Jimmy',
-          last_name: 'John'
+          firstName: 'Jimmy',
+          lastName: 'John'
         });
         expect(mockRequest.logIn.calledOnce).to.be.true;
         expect(mockRequest.user).to.deep.equal({
           id: 42,
-          first_name: 'Jimmy',
-          last_name: 'John'
+          firstName: 'Jimmy',
+          lastName: 'John'
         });
         expect(mockRequest.callback).to.exist;
       });
@@ -116,8 +116,8 @@ describe('service: authentication', function() {
           });
           mockPassport.callback(null, {
             id: 42,
-            first_name: 'Jimmy',
-            last_name: 'John'
+            firstName: 'Jimmy',
+            lastName: 'John'
           });
           mockRequest.callback('I am a login error');
           expect(param).to.equal('I am a login error');
@@ -132,8 +132,8 @@ describe('service: authentication', function() {
           });
           mockPassport.callback(null, {
             id: 42,
-            first_name: 'Jimmy',
-            last_name: 'John'
+            firstName: 'Jimmy',
+            lastName: 'John'
           });
           mockRequest.callback();
           expect(param).to.be.undefined;
@@ -142,8 +142,8 @@ describe('service: authentication', function() {
             mockJWT.sign.calledWith(
               {
                 id: 42,
-                first_name: 'Jimmy',
-                last_name: 'John'
+                firstName: 'Jimmy',
+                lastName: 'John'
               },
               process.env.JWT_PRIVATE_KEY,
               { expiresIn: '10d' }
@@ -162,8 +162,8 @@ describe('service: authentication', function() {
           });
           mockPassport.callback(null, {
             id: 42,
-            first_name: 'Jimmy',
-            last_name: 'John'
+            firstName: 'Jimmy',
+            lastName: 'John'
           });
           mockRequest.callback();
           expect(param).to.be.undefined;
@@ -171,7 +171,7 @@ describe('service: authentication', function() {
           expect(
             mockResponse.send.calledWith({
               success: true,
-              user: { id: 42, first_name: 'Jimmy', last_name: 'John' },
+              user: { id: 42, firstName: 'Jimmy', lastName: 'John' },
               token: 'IAmAFakeToken'
             })
           ).to.be.true;
@@ -218,8 +218,8 @@ describe('service: authentication', function() {
     it('generates a new toekn if the verify succeeds', function() {
       mockJWT.verify.returns({
         id: 1138,
-        first_name: 'Ted',
-        last_name: 'Senspeck'
+        firstName: 'Ted',
+        lastName: 'Senspeck'
       });
       service.refresh(mockRequest, mockResponse);
       expect(mockJWT.sign.calledOnce).to.be.true;
@@ -227,8 +227,8 @@ describe('service: authentication', function() {
         mockJWT.sign.calledWith(
           {
             id: 1138,
-            first_name: 'Ted',
-            last_name: 'Senspeck'
+            firstName: 'Ted',
+            lastName: 'Senspeck'
           },
           'IAmAFakeCertificateForRefresh'
         )
@@ -238,8 +238,8 @@ describe('service: authentication', function() {
     it('strips the iat and exp props from the user', function() {
       mockJWT.verify.returns({
         id: 1138,
-        first_name: 'Ted',
-        last_name: 'Senspeck',
+        firstName: 'Ted',
+        lastName: 'Senspeck',
         iat: 'whatever',
         exp: 19930124509912485
       });
@@ -249,8 +249,8 @@ describe('service: authentication', function() {
         mockJWT.sign.calledWith(
           {
             id: 1138,
-            first_name: 'Ted',
-            last_name: 'Senspeck'
+            firstName: 'Ted',
+            lastName: 'Senspeck'
           },
           'IAmAFakeCertificateForRefresh'
         )
@@ -260,8 +260,8 @@ describe('service: authentication', function() {
     it('sends back the new token', function() {
       mockJWT.verify.returns({
         id: 1138,
-        first_name: 'Ted',
-        last_name: 'Senspeck',
+        firstName: 'Ted',
+        lastName: 'Senspeck',
         iat: 'whatever',
         exp: 19930124509912485
       });
@@ -273,8 +273,8 @@ describe('service: authentication', function() {
           success: true,
           user: {
             id: 1138,
-            first_name: 'Ted',
-            last_name: 'Senspeck'
+            firstName: 'Ted',
+            lastName: 'Senspeck'
           },
           token: 'IAmANewlyRefreshedFakeToken'
         })
@@ -317,8 +317,8 @@ describe('service: authentication', function() {
     it('returns true if the current token is not valid', function() {
       mockJWT.verify.returns({
         id: 1138,
-        first_name: 'Ted',
-        last_name: 'Senspeck',
+        firstName: 'Ted',
+        lastName: 'Senspeck',
         roles: ['admin', 'user'],
         iat: 'whatever',
         exp: 19930124509912485
@@ -350,8 +350,8 @@ describe('service: authentication', function() {
     it('goes on to next if the user is logged in', function() {
       mockJWT.verify.returns({
         id: 1138,
-        first_name: 'Ted',
-        last_name: 'Senspeck',
+        firstName: 'Ted',
+        lastName: 'Senspeck',
         roles: ['admin', 'user'],
         iat: 'whatever',
         exp: 19930124509912485
@@ -389,8 +389,8 @@ describe('service: authentication', function() {
       sinon.stub(mockJWT, 'verify');
       mockJWT.verify.returns({
         id: 1138,
-        first_name: 'Ted',
-        last_name: 'Senspeck',
+        firstName: 'Ted',
+        lastName: 'Senspeck',
         roles: ['admin', 'user'],
         iat: 'whatever',
         exp: 19930124509912485
@@ -434,8 +434,8 @@ describe('service: authentication', function() {
       sinon.stub(mockJWT, 'verify');
       mockJWT.verify.returns({
         id: 1138,
-        first_name: 'Ted',
-        last_name: 'Senspeck',
+        firstName: 'Ted',
+        lastName: 'Senspeck',
         roles: ['admin', 'user'],
         iat: 'whatever',
         exp: 19930124509912485

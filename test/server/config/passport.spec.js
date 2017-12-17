@@ -78,8 +78,8 @@ describe('config: passport', function() {
       beforeEach(function() {
         user = {
           id: 1138,
-          first_name: 'Karl',
-          last_name: 'Smith'
+          firstName: 'Karl',
+          lastName: 'Smith'
         };
         users.get.returns(Promise.resolve(user));
       });
