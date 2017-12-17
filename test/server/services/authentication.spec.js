@@ -4,7 +4,7 @@ const expect = require('chai').expect;
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
-describe('service: authentication', function() {
+describe('service: authentication', () => {
   let mockJWT;
 
   class MockRequest {
@@ -22,13 +22,13 @@ describe('service: authentication', function() {
   }
   let mockResponse;
 
-  beforeEach(function() {
+  beforeEach(() => {
     mockRequest = new MockRequest();
     mockResponse = new MockResponse();
     mockJWT = {};
   });
 
-  describe('authenticate', function() {
+  describe('authenticate', () => {
     class MockPassport {
       constructor() {
         this.mockAuth = sinon.stub();
@@ -43,7 +43,7 @@ describe('service: authentication', function() {
     let mockPassport;
     let service;
 
-    beforeEach(function() {
+    beforeEach(() => {
       mockPassport = new MockPassport();
       const Service = proxyquire('../../../server/services/authentication', {
         passport: mockPassport,
@@ -52,7 +52,7 @@ describe('service: authentication', function() {
       service = new Service();
     });
 
-    it('calls passport authenticate', function() {
+    it('calls passport authenticate', () => {
       sinon.spy(mockPassport, 'authenticate');
       service.authenticate();
       expect(mockPassport.authenticate.calledOnce).to.be.true;
@@ -60,7 +60,7 @@ describe('service: authentication', function() {
       expect(mockPassport.callback).to.exist;
     });
 
-    it('calls the generated auth function', function() {
+    it('calls the generated auth function', () => {
       const mockNext = sinon.stub();
       service.authenticate(mockRequest, mockResponse, mockNext);
       expect(mockPassport.mockAuth.calledOnce).to.be.true;
@@ -69,8 +69,8 @@ describe('service: authentication', function() {
       ).to.be.true;
     });
 
-    describe('callback', function() {
-      it('passes any error to next', function() {
+    describe('callback', () => {
+      it('passes any error to next', () => {
         let param;
         service.authenticate(mockRequest, mockResponse, p => {
           param = p;
@@ -79,7 +79,7 @@ describe('service: authentication', function() {
         expect(param).to.equal('I am an error');
       });
 
-      it('responds false if there is no user', function() {
+      it('responds false if there is no user', () => {
         let param;
         sinon.spy(mockResponse, 'send');
         service.authenticate(mockRequest, mockResponse, p => {
@@ -91,7 +91,7 @@ describe('service: authentication', function() {
         expect(mockResponse.send.calledWith({ success: false })).to.be.true;
       });
 
-      it('sets up the login callback if there is a user', function() {
+      it('sets up the login callback if there is a user', () => {
         sinon.spy(mockRequest, 'logIn');
         service.authenticate(mockRequest, mockResponse, p => {});
         mockPassport.callback(null, {
@@ -108,8 +108,8 @@ describe('service: authentication', function() {
         expect(mockRequest.callback).to.exist;
       });
 
-      describe('login callback', function() {
-        it('passes any error on to next', function() {
+      describe('login callback', () => {
+        it('passes any error on to next', () => {
           let param;
           service.authenticate(mockRequest, mockResponse, p => {
             param = p;
@@ -123,7 +123,7 @@ describe('service: authentication', function() {
           expect(param).to.equal('I am a login error');
         });
 
-        it('generates a token', function() {
+        it('generates a token', () => {
           let param;
           process.env.JWT_PRIVATE_KEY = 'IAmAFakeCertificate';
           sinon.stub(mockJWT, 'sign');
@@ -151,7 +151,7 @@ describe('service: authentication', function() {
           ).to.be.true;
         });
 
-        it('sends back the user and token', function() {
+        it('sends back the user and token', () => {
           let param;
           process.env.JWT_PRIVATE_KEY = 'IAmAFakeCertificate';
           sinon.spy(mockResponse, 'send');
@@ -180,9 +180,9 @@ describe('service: authentication', function() {
     });
   });
 
-  describe('refresh', function() {
+  describe('refresh', () => {
     let service;
-    beforeEach(function() {
+    beforeEach(() => {
       const Service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
@@ -197,7 +197,7 @@ describe('service: authentication', function() {
       sinon.stub(mockResponse, 'send');
     });
 
-    it('verifies the current token', function() {
+    it('verifies the current token', () => {
       service.refresh(mockRequest, mockResponse);
       expect(mockJWT.verify.calledOnce).to.be.true;
       expect(
@@ -208,14 +208,14 @@ describe('service: authentication', function() {
       ).to.be.true;
     });
 
-    it('sends a false response if the verify fails', function() {
+    it('sends a false response if the verify fails', () => {
       mockJWT.verify.throws(new Error('bad token'));
       service.refresh(mockRequest, mockResponse);
       expect(mockResponse.send.calledOnce).to.be.true;
       expect(mockResponse.send.calledWith({ success: false })).to.be.true;
     });
 
-    it('generates a new toekn if the verify succeeds', function() {
+    it('generates a new toekn if the verify succeeds', () => {
       mockJWT.verify.returns({
         id: 1138,
         firstName: 'Ted',
@@ -235,7 +235,7 @@ describe('service: authentication', function() {
       ).to.be.true;
     });
 
-    it('strips the iat and exp props from the user', function() {
+    it('strips the iat and exp props from the user', () => {
       mockJWT.verify.returns({
         id: 1138,
         firstName: 'Ted',
@@ -257,7 +257,7 @@ describe('service: authentication', function() {
       ).to.be.true;
     });
 
-    it('sends back the new token', function() {
+    it('sends back the new token', () => {
       mockJWT.verify.returns({
         id: 1138,
         firstName: 'Ted',
@@ -282,9 +282,9 @@ describe('service: authentication', function() {
     });
   });
 
-  describe('isAuthenticated', function() {
+  describe('isAuthenticated', () => {
     let service;
-    beforeEach(function() {
+    beforeEach(() => {
       const Service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
@@ -298,7 +298,7 @@ describe('service: authentication', function() {
       sinon.stub(mockJWT, 'verify');
     });
 
-    it('verifies the current token', function() {
+    it('verifies the current token', () => {
       service.isAuthenticated(mockRequest);
       expect(mockJWT.verify.calledOnce).to.be.true;
       expect(
@@ -309,12 +309,12 @@ describe('service: authentication', function() {
       ).to.be.true;
     });
 
-    it('returns false if the current token is not valid', function() {
+    it('returns false if the current token is not valid', () => {
       mockJWT.verify.throws(new Error('bad wolf'));
       expect(service.isAuthenticated(mockRequest)).to.be.false;
     });
 
-    it('returns true if the current token is not valid', function() {
+    it('returns true if the current token is not valid', () => {
       mockJWT.verify.returns({
         id: 1138,
         firstName: 'Ted',
@@ -327,10 +327,10 @@ describe('service: authentication', function() {
     });
   });
 
-  describe('requireApiLogin', function() {
+  describe('requireApiLogin', () => {
     let service;
     let mockNext;
-    beforeEach(function() {
+    beforeEach(() => {
       const Service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
@@ -347,7 +347,7 @@ describe('service: authentication', function() {
       mockNext = sinon.stub();
     });
 
-    it('goes on to next if the user is logged in', function() {
+    it('goes on to next if the user is logged in', () => {
       mockJWT.verify.returns({
         id: 1138,
         firstName: 'Ted',
@@ -363,7 +363,7 @@ describe('service: authentication', function() {
       expect(mockResponse.end.called).to.be.false;
     });
 
-    it('sends a 401 if the user is not logged in', function() {
+    it('sends a 401 if the user is not logged in', () => {
       mockJWT.verify.throws(new Error('bad wolf'));
       service.requireApiLogin(mockRequest, mockResponse, mockNext);
       expect(mockNext.called).to.be.false;
@@ -373,10 +373,10 @@ describe('service: authentication', function() {
     });
   });
 
-  describe('requireRole', function() {
+  describe('requireRole', () => {
     let service;
     let mockNext;
-    beforeEach(function() {
+    beforeEach(() => {
       const Service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
@@ -401,7 +401,7 @@ describe('service: authentication', function() {
       mockNext = sinon.stub();
     });
 
-    it('goes on to next if the user is in the specified role', function() {
+    it('goes on to next if the user is in the specified role', () => {
       service.requireRole('admin')(mockRequest, mockResponse, mockNext);
       expect(mockNext.calledOnce).to.be.true;
       expect(mockResponse.send.called).to.be.false;
@@ -409,7 +409,7 @@ describe('service: authentication', function() {
       expect(mockResponse.end.called).to.be.false;
     });
 
-    it('sends a 403 if the user is not in the specified role', function() {
+    it('sends a 403 if the user is not in the specified role', () => {
       service.requireRole('bogus')(mockRequest, mockResponse, mockNext);
       expect(mockNext.called).to.be.false;
       expect(mockResponse.status.calledOnce).to.be.true;
@@ -418,10 +418,10 @@ describe('service: authentication', function() {
     });
   });
 
-  describe('requireRoleOrId', function() {
+  describe('requireRoleOrId', () => {
     let service;
     let mockNext;
-    beforeEach(function() {
+    beforeEach(() => {
       const Service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
@@ -446,7 +446,7 @@ describe('service: authentication', function() {
       mockNext = sinon.stub();
     });
 
-    it('goes on to next if the user is in the specified role', function() {
+    it('goes on to next if the user is in the specified role', () => {
       mockRequest.params = {
         id: '4298'
       };
@@ -457,7 +457,7 @@ describe('service: authentication', function() {
       expect(mockResponse.end.called).to.be.false;
     });
 
-    it('goes on to next if the user id matches the specified id', function() {
+    it('goes on to next if the user id matches the specified id', () => {
       mockRequest.params = {
         id: '1138'
       };
@@ -468,7 +468,7 @@ describe('service: authentication', function() {
       expect(mockResponse.end.called).to.be.false;
     });
 
-    it('sends a 403 if the ids do not match and the user is not in the specified role', function() {
+    it('sends a 403 if the ids do not match and the user is not in the specified role', () => {
       mockRequest.params = {
         id: '42'
       };

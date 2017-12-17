@@ -20,11 +20,11 @@ class MockPassport {
   }
 }
 
-describe('config: passport', function() {
+describe('config: passport', () => {
   let passport;
   let users;
 
-  beforeEach(function() {
+  beforeEach(() => {
     passport = new MockPassport();
     users = {
       get: sinon.stub(),
@@ -40,8 +40,8 @@ describe('config: passport', function() {
     config();
   });
 
-  describe('authentication', function() {
-    it('gets the user', function() {
+  describe('authentication', () => {
+    it('gets the user', () => {
       passport.strategy.authenticate(
         'kws@email.com',
         'secretSauc3',
@@ -51,8 +51,8 @@ describe('config: passport', function() {
       expect(users.get.calledWith('kws@email.com')).to.be.true;
     });
 
-    describe('without a matching user', function() {
-      it('does not check the password', function() {
+    describe('without a matching user', () => {
+      it('does not check the password', () => {
         passport.strategy.authenticate(
           'kws@email.com',
           'secretSauc3',
@@ -61,21 +61,22 @@ describe('config: passport', function() {
         expect(users.passwordMatches.called).to.be.false;
       });
 
-      it('calls the done callback with false', function(done) {
-        passport.strategy.authenticate('kws@email.com', 'secretSauc3', function(
-          err,
-          value
-        ) {
-          expect(err).to.equal(null);
-          expect(value).to.be.false;
-          done();
-        });
+      it('calls the done callback with false', done => {
+        passport.strategy.authenticate(
+          'kws@email.com',
+          'secretSauc3',
+          (err, value) => {
+            expect(err).to.equal(null);
+            expect(value).to.be.false;
+            done();
+          }
+        );
       });
     });
 
-    describe('with a matching user', function() {
+    describe('with a matching user', () => {
       let user;
-      beforeEach(function() {
+      beforeEach(() => {
         user = {
           id: 1138,
           firstName: 'Karl',
@@ -84,7 +85,7 @@ describe('config: passport', function() {
         users.get.returns(Promise.resolve(user));
       });
 
-      it('checks the password', async function() {
+      it('checks the password', async () => {
         await passport.strategy.authenticate(
           'kws@email.com',
           'secretSauc3',
@@ -95,36 +96,34 @@ describe('config: passport', function() {
           .true;
       });
 
-      it('calls done with false if the password does not match', function(
-        done
-      ) {
-        passport.strategy.authenticate('kws@email.com', 'secretSauc3', function(
-          err,
-          value
-        ) {
-          expect(err).to.equal(null);
-          expect(value).to.be.false;
-          done();
-        });
+      it('calls done with false if the password does not match', done => {
+        passport.strategy.authenticate(
+          'kws@email.com',
+          'secretSauc3',
+          (err, value) => {
+            expect(err).to.equal(null);
+            expect(value).to.be.false;
+            done();
+          }
+        );
       });
 
-      it('calls done with uesr if the password does match', function(
-        done
-      ) {
+      it('calls done with uesr if the password does match', done => {
         users.passwordMatches.returns(Promise.resolve(true));
-        passport.strategy.authenticate('kws@email.com', 'secretSauc3', function(
-          err,
-          value
-        ) {
-          expect(err).to.equal(null);
-          expect(value).to.deep.equal(user);
-          done();
-        });
+        passport.strategy.authenticate(
+          'kws@email.com',
+          'secretSauc3',
+          (err, value) => {
+            expect(err).to.equal(null);
+            expect(value).to.deep.equal(user);
+            done();
+          }
+        );
       });
     });
   });
 
-  it('sets up the serializer', function() {
+  it('sets up the serializer', () => {
     expect(passport.serializer).to.exist;
   });
 });

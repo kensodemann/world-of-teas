@@ -9,13 +9,13 @@ import testTeaCategories from '@/assets/test-data/tea-categories';
 Vue.use(VueResource);
 Vue.use(VueResourceMock, testDataService, { silent: true });
 
-describe('tea-categories', function() {
-  it('exists', function() {
+describe('tea-categories', () => {
+  it('exists', () => {
     expect(teaCategories).to.exist;
   });
 
-  describe('get all', function() {
-    it('gets all of the tea categories', function() {
+  describe('get all', () => {
+    it('gets all of the tea categories', () => {
       return teaCategories.getAll().then(res => {
         expect(res).to.deep.equal(testTeaCategories);
       });

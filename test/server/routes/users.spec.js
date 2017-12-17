@@ -7,7 +7,7 @@ const proxyquire = require('proxyquire');
 const request = require('supertest');
 const sinon = require('sinon');
 
-describe('route: /api/users', function() {
+describe('route: /api/users', () => {
   let app;
   let auth;
   let mockJWT;
@@ -36,7 +36,7 @@ describe('route: /api/users', function() {
     }
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     mockJWT = {};
     const AuthService = proxyquire('../../../server/services/authentication', {
       jsonwebtoken: mockJWT
@@ -82,44 +82,44 @@ describe('route: /api/users', function() {
     })(app, auth, pool);
   });
 
-  describe('get', function() {
-    it('requires an API login', function(done) {
+  describe('get', () => {
+    it('requires an API login', done => {
       mockJWT.verify.throws(new Error('no loggy loggy'));
       request(app)
         .get('/api/users')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.deep.equal({});
           done();
         });
     });
 
-    it('returns the data', function(done) {
+    it('returns the data', done => {
       request(app)
         .get('/api/users')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.deep.equal(testData);
           done();
         });
     });
 
-    describe('with an id', function() {
-      it('requires an API login', function(done) {
+    describe('with an id', () => {
+      it('requires an API login', done => {
         mockJWT.verify.throws(new Error('no loggy loggy'));
         request(app)
           .get('/api/users/30')
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(401);
             expect(res.body).to.deep.equal({});
             done();
           });
       });
 
-      it('returns the data if the current user is admin', function(done) {
+      it('returns the data if the current user is admin', done => {
         request(app)
           .get('/api/users/30')
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 30,
@@ -130,7 +130,7 @@ describe('route: /api/users', function() {
           });
       });
 
-      it('returns the data if the ids match', function(done) {
+      it('returns the data if the ids match', done => {
         mockJWT.verify.returns({
           id: 30,
           firstName: 'Barney',
@@ -141,7 +141,7 @@ describe('route: /api/users', function() {
         });
         request(app)
           .get('/api/users/30')
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 30,
@@ -152,7 +152,7 @@ describe('route: /api/users', function() {
           });
       });
 
-      it('returns 403 if user not admin and ids do not match', function(done) {
+      it('returns 403 if user not admin and ids do not match', done => {
         mockJWT.verify.returns({
           id: 10,
           firstName: 'Fred',
@@ -163,17 +163,17 @@ describe('route: /api/users', function() {
         });
         request(app)
           .get('/api/users/30')
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(403);
             expect(res.body).to.deep.equal({});
             done();
           });
       });
 
-      it('returns 404 if the user is not found', function(done) {
+      it('returns 404 if the user is not found', done => {
         request(app)
           .get('/api/users/314159')
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(404);
             done();
           });
@@ -198,7 +198,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(401);
             expect(res.body).to.deep.equal({});
             done();
@@ -214,7 +214,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               id: 30,
@@ -243,7 +243,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               id: 30,
@@ -264,7 +264,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 30,
@@ -285,7 +285,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               id: 30,
@@ -306,7 +306,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(404);
             expect(res.body).to.deep.equal({});
             done();
@@ -330,7 +330,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(403);
             expect(res.body).to.deep.equal({});
             done();
@@ -348,7 +348,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(401);
             expect(res.body).to.deep.equal({});
             done();
@@ -363,7 +363,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               firstName: 'Barney',
@@ -382,7 +382,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(200);
             expect(res.body).to.deep.equal({
               id: 314159,
@@ -394,7 +394,7 @@ describe('route: /api/users', function() {
           });
       });
 
-      it('clears the id if specified in the body', (done) => {
+      it('clears the id if specified in the body', done => {
         request(app)
           .post('/api/users')
           .send({
@@ -403,7 +403,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(saveCalled).to.equal(1);
             expect(saveCalledWith).to.deep.equal({
               firstName: 'Barney',
@@ -430,7 +430,7 @@ describe('route: /api/users', function() {
             lastName: 'Rubble',
             email: 'barney@rubble.kings.io'
           })
-          .end(function(err, res) {
+          .end((err, res) => {
             expect(res.status).to.equal(403);
             expect(res.body).to.deep.equal({});
             done();
