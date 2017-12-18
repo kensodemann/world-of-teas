@@ -6,7 +6,7 @@ const MockPool = require('../mocks/mock-pool');
 const proxyquire = require('proxyquire');
 const request = require('supertest');
 
-describe('route: /api/tea-categories', function() {
+describe('route: /api/tea-categories', () => {
   let app;
   let testData;
 
@@ -16,7 +16,7 @@ describe('route: /api/tea-categories', function() {
     }
   }
 
-  beforeEach(function() {
+  beforeEach(() => {
     app = express();
     require('../../../server/config/express')(app);
     const pool = new MockPool();
@@ -42,11 +42,11 @@ describe('route: /api/tea-categories', function() {
     })(app, pool);
   });
 
-  describe('get', function() {
-    it('returns the data', function(done) {
+  describe('get', () => {
+    it('returns the data', done => {
       request(app)
         .get('/api/tea-categories')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.deep.equal(testData);
           done();

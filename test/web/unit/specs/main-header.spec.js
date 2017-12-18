@@ -12,7 +12,7 @@ describe('main-header.vue', () => {
     expect(links[3].textContent).to.equal('Links');
   });
 
-  it('should render correct admin links', function() {
+  it('should render correct admin links', () => {
     const vm = mountRoutedComponent();
     const links = vm.$el.querySelectorAll('.header .admin-items a');
     expect(links.length).to.equal(1);

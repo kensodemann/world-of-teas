@@ -5,12 +5,12 @@ const MockPool = require('../mocks/mock-pool');
 const sinon = require('sinon');
 const Servce = require('../../../server/services/tea-categories');
 
-describe('service: tea-categories', function() {
+describe('service: tea-categories', () => {
   let pool;
   let service;
   let testData;
 
-  beforeEach(function() {
+  beforeEach(() => {
     pool = new MockPool();
     testData = [
       {
@@ -32,14 +32,14 @@ describe('service: tea-categories', function() {
     service = new Servce(pool);
   });
 
-  describe('getAll', function() {
-    it('connects to the pool', function() {
+  describe('getAll', () => {
+    it('connects to the pool', () => {
       sinon.spy(pool, 'connect');
       service.getAll();
       expect(pool.connect.calledOnce).to.be.true;
     });
 
-    it('queries the tea categories', async function() {
+    it('queries the tea categories', async () => {
       sinon.spy(pool.test_client, 'query');
       await service.getAll();
       expect(pool.test_client.query.calledOnce).to.be.true;
@@ -47,14 +47,14 @@ describe('service: tea-categories', function() {
         .to.be.true;
     });
 
-    it('returns the data', async function() {
+    it('returns the data', async () => {
       sinon.stub(pool.test_client, 'query');
       pool.test_client.query.returns(Promise.resolve({ rows: testData }));
       const data = await service.getAll();
       expect(data).to.deep.equal(testData);
     });
 
-    it('releases the client', async function() {
+    it('releases the client', async () => {
       sinon.spy(pool.test_client, 'release');
       await service.getAll();
       expect(pool.test_client.release.calledOnce).to.be.true;
