@@ -1,10 +1,13 @@
 'use strict';
 
+const Password = require('./password');
+
 const columns = 'id, first_name as "firstName", last_name as "lastName", email';
 
 module.exports = class Users {
   constructor(pool) {
     this._pool = pool;
+    this._password = new Password(pool);
   }
 
   async getAll() {
@@ -40,6 +43,9 @@ module.exports = class Users {
         'insert into users(first_name, last_name, email) values($1, $2, $3) returning *',
         [user.firstName, user.lastName, user.email]
       );
+      if (rtn.rows && rtn.rows[0] && rtn.rows[0].id) {
+        this._password.initialize(rtn.rows[0].id, user.password || 'password');
+      }
     }
     client.release();
     return rtn.rows && rtn.rows[0];

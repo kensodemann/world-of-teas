@@ -2,8 +2,25 @@
 
 const expect = require('chai').expect;
 const MockPool = require('../mocks/mock-pool');
+const proxyquire = require('proxyquire');
 const sinon = require('sinon');
-const Servce = require('../../../server/services/users');
+
+let passwordCalls;
+class MockPasswordService {
+  constructor() {
+    passwordCalls = new Map();
+  }
+
+  initialize(id, password) {
+    passwordCalls.set('method', 'initialize');
+    passwordCalls.set('id', id);
+    passwordCalls.set('password', password);
+  }
+}
+
+const Service = proxyquire('../../../server/services/users', {
+  './password': MockPasswordService
+});
 
 describe('service: users', () => {
   let pool;
@@ -31,7 +48,7 @@ describe('service: users', () => {
     let service;
 
     beforeEach(() => {
-      service = new Servce(pool);
+      service = new Service(pool);
     });
 
     it('connects to the pool', () => {
@@ -66,7 +83,7 @@ describe('service: users', () => {
     let service;
 
     beforeEach(() => {
-      service = new Servce(pool);
+      service = new Service(pool);
     });
 
     it('connects to the pool', () => {
@@ -98,7 +115,9 @@ describe('service: users', () => {
       await service.get('42@1138.73');
       expect(pool.test_client.query.calledOnce).to.be.true;
       const args = pool.test_client.query.args[0];
-      expect(/select .* from users where upper\(email\) = upper\(\$1\)/.test(args[0])).to.be.true;
+      expect(
+        /select .* from users where upper\(email\) = upper\(\$1\)/.test(args[0])
+      ).to.be.true;
       expect(args[1]).to.deep.equal(['42@1138.73']);
     });
 
@@ -144,7 +163,7 @@ describe('service: users', () => {
     let service;
 
     beforeEach(() => {
-      service = new Servce(pool);
+      service = new Service(pool);
     });
 
     it('connects to the pool', async () => {
@@ -169,6 +188,16 @@ describe('service: users', () => {
         const sql = pool.test_client.query.args[0][0];
         expect(/^update users.*where id = \$1 returning \*/.test(sql)).to.be
           .true;
+      });
+
+      it('does not touch the password', async () => {
+        await service.save({
+          id: 4273,
+          firstName: 'Tess',
+          lastName: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+        expect(passwordCalls.get('method')).to.be.undefined;
       });
 
       it('resolves the updated user', async () => {
@@ -223,6 +252,55 @@ describe('service: users', () => {
         expect(pool.test_client.query.calledOnce).to.be.true;
         const sql = pool.test_client.query.args[0][0];
         expect(/^insert into users.*returning \*/.test(sql)).to.be.true;
+      });
+
+      it('creates an initial password', async () => {
+        sinon.stub(pool.test_client, 'query');
+        pool.test_client.query.returns(
+          Promise.resolve({
+            rows: [
+              {
+                id: 1138,
+                firstName: 'Tess',
+                lastName: 'McTesterson',
+                email: 'tess@test.ly'
+              }
+            ]
+          })
+        );
+        await service.save({
+          firstName: 'Tess',
+          lastName: 'McTesterson',
+          email: 'tess@test.ly',
+          password: 'I am a freak'
+        });
+        expect(passwordCalls.get('method')).to.equal('initialize');
+        expect(passwordCalls.get('id')).to.equal(1138);
+        expect(passwordCalls.get('password')).to.equal('I am a freak');
+      });
+
+      it('defaults to password if no password is given', async () => {
+        sinon.stub(pool.test_client, 'query');
+        pool.test_client.query.returns(
+          Promise.resolve({
+            rows: [
+              {
+                id: 1138,
+                firstName: 'Tess',
+                lastName: 'McTesterson',
+                email: 'tess@test.ly'
+              }
+            ]
+          })
+        );
+        await service.save({
+          firstName: 'Tess',
+          lastName: 'McTesterson',
+          email: 'tess@test.ly'
+        });
+        expect(passwordCalls.get('method')).to.equal('initialize');
+        expect(passwordCalls.get('id')).to.equal(1138);
+        expect(passwordCalls.get('password')).to.equal('password');
       });
 
       it('resolves the inserted user', async () => {
