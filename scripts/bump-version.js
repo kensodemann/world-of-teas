@@ -3,34 +3,21 @@
 const adjNoun = require('adj-noun');
 const fs = require('fs');
 const moment = require('moment');
+const packageFile = require('./packageFile');
 const semver = require('semver');
 
-const packageFile = './package.json';
 const versionFile = './src/assets/version.json';
-let pkg;
 
 function getBumpType() {
   const lastArg = process.argv[process.argv.length - 1];
-  if (['prerelease', 'patch', 'minor', 'major'].includes(lastArg)) {
+  if (['prerelease', 'prepatch', 'preminor', 'premajor', 'patch', 'minor', 'major'].includes(lastArg)) {
     return lastArg;
   }
   return 'prerelease';
 }
 
-function nextVersion(releaseType) {
-  return semver.inc(pkg.version, releaseType);
-}
 
-function readPackage() {
-  return JSON.parse(fs.readFileSync(packageFile, 'utf8'));
-}
-
-function writePackage() {
-  fs.writeFileSync(packageFile, JSON.stringify(pkg, null, 2));
-  fs.appendFileSync(packageFile, '\n');
-}
-
-function writeVersionFile() {
+function writeVersionFile(pkg) {
   adjNoun.seed(moment().valueOf());
   const version = {
     version: pkg.version,
@@ -42,7 +29,7 @@ function writeVersionFile() {
 }
 
 const type = getBumpType();
-pkg = readPackage();
-pkg.version = nextVersion(type);
-writePackage();
-writeVersionFile();
+const pkg = packageFile.read();
+pkg.version = semver.inc(pkg.version, type);
+packageFile.write(pkg);
+writeVersionFile(pkg);
