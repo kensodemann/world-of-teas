@@ -2,7 +2,7 @@
 
 const expect = require('chai').expect;
 const proxyquire = require('proxyquire');
-const sinon = require('sinon');
+const MockPool = require('../mocks/mock-pool');
 
 class MockLocalStrategy {
   constructor(cb) {
@@ -20,35 +20,53 @@ class MockPassport {
   }
 }
 
+let passwordMatches = false;
+let matchesCalls;
+let matchesId;
+let matchesPassword;
+class MockPassword {
+  matches(id, password) {
+    matchesCalls++;
+    matchesId = id;
+    matchesPassword = password;
+    return Promise.resolve(passwordMatches);
+  }
+}
+
+let returnedUser;
+let getCalls;
+let getCallArgs;
+class MockUsers {
+  get(u) {
+    getCalls++;
+    getCallArgs = u;
+    return Promise.resolve(returnedUser);
+  }
+}
+
 describe('config: passport', () => {
   let passport;
-  let users;
 
   beforeEach(() => {
+    const pool = new MockPool();
     passport = new MockPassport();
-    users = {
-      get: sinon.stub(),
-      passwordMatches: sinon.stub()
-    };
-    users.get.returns(Promise.resolve(undefined));
-    users.passwordMatches.returns(Promise.resolve(false));
+    getCalls = 0;
+    getCallArgs = undefined;
+    matchesCalls = 0;
     const config = proxyquire('../../../server/config/passport', {
       passport: passport,
       'passport-local': { Strategy: MockLocalStrategy },
-      '../services/users': users
+      '../services/password': MockPassword,
+      '../services/users': MockUsers
     });
-    config();
+    config(pool);
   });
 
   describe('authentication', () => {
     it('gets the user', () => {
-      passport.strategy.authenticate(
-        'kws@email.com',
-        'secretSauc3',
-        function() {}
-      );
-      expect(users.get.calledOnce).to.be.true;
-      expect(users.get.calledWith('kws@email.com')).to.be.true;
+      passport.strategy.authenticate('kws@email.com', 'secretSauc3', () => {});
+      expect(getCalls).to.equal(1);
+      expect(getCallArgs).to.equal('kws@email.com');
     });
 
     describe('without a matching user', () => {
@@ -56,9 +74,9 @@ describe('config: passport', () => {
         passport.strategy.authenticate(
           'kws@email.com',
           'secretSauc3',
-          function() {}
+          () => {}
         );
-        expect(users.passwordMatches.called).to.be.false;
+        expect(matchesCalls).to.equal(0);
       });
 
       it('calls the done callback with false', done => {
@@ -75,25 +93,23 @@ describe('config: passport', () => {
     });
 
     describe('with a matching user', () => {
-      let user;
       beforeEach(() => {
-        user = {
+        returnedUser = {
           id: 1138,
           firstName: 'Karl',
           lastName: 'Smith'
         };
-        users.get.returns(Promise.resolve(user));
       });
 
       it('checks the password', async () => {
         await passport.strategy.authenticate(
           'kws@email.com',
           'secretSauc3',
-          function() {}
+          () => {}
         );
-        expect(users.passwordMatches.calledOnce).to.be.true;
-        expect(users.passwordMatches.calledWith(1138, 'secretSauc3')).to.be
-          .true;
+        expect(matchesCalls).to.equal(1);
+        expect(matchesId).to.equal(1138);
+        expect(matchesPassword).to.equal('secretSauc3');
       });
 
       it('calls done with false if the password does not match', done => {
@@ -109,13 +125,13 @@ describe('config: passport', () => {
       });
 
       it('calls done with uesr if the password does match', done => {
-        users.passwordMatches.returns(Promise.resolve(true));
+        passwordMatches = true;
         passport.strategy.authenticate(
           'kws@email.com',
           'secretSauc3',
           (err, value) => {
             expect(err).to.equal(null);
-            expect(value).to.deep.equal(user);
+            expect(value).to.deep.equal(returnedUser);
             done();
           }
         );

@@ -2,7 +2,6 @@
 
 const expect = require('chai').expect;
 const MockPool = require('../mocks/mock-pool');
-const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 const Servce = require('../../../server/services/users');
 
@@ -260,76 +259,6 @@ describe('service: users', () => {
         firstName: 'Tess',
         lastName: 'McTesterson'
       });
-      expect(pool.test_client.release.calledOnce).to.be.true;
-    });
-  });
-
-  describe('password is valid', () => {
-    let service;
-
-    beforeEach(() => {
-      const mockEncryption = {
-        hash: sinon.stub()
-      };
-      mockEncryption.hash
-        .withArgs('39949AAC43', 'IamPassw0rd')
-        .returns('F00BA4');
-      const ProxiedService = proxyquire('../../../server/services/users', {
-        './encryption': mockEncryption
-      });
-      service = new ProxiedService(pool);
-    });
-
-    it('connects to the pool', () => {
-      sinon.spy(pool, 'connect');
-      service.passwordMatches(42, 'shhhhhIam$ecret');
-      expect(pool.connect.calledOnce).to.be.true;
-    });
-
-    it('queries the user credentials', async () => {
-      sinon.spy(pool.test_client, 'query');
-      await service.passwordMatches(42, 'IamPassw0rd');
-      expect(pool.test_client.query.calledOnce).to.be.true;
-      expect(
-        pool.test_client.query.calledWith(
-          'select * from user_credentials where id = $1',
-          [42]
-        )
-      ).to.be.true;
-    });
-
-    it('resolves false if the user has no credentials record', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(Promise.resolve({ rows: [] }));
-      const match = await service.passwordMatches(42, 'IamPassw0rd');
-      expect(match).to.be.false;
-    });
-
-    it('resolves false if the password hashes do not match', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(
-        Promise.resolve({
-          rows: [{ id: 42, salt: '39949AAC43', password: 'ABBA1357CDDF' }]
-        })
-      );
-      const match = await service.passwordMatches(42, 'IamPassw0rd');
-      expect(match).to.be.false;
-    });
-
-    it('resolves true if the password hashes do match', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(
-        Promise.resolve({
-          rows: [{ id: 42, salt: '39949AAC43', password: 'F00BA4' }]
-        })
-      );
-      const match = await service.passwordMatches(42, 'IamPassw0rd');
-      expect(match).to.be.true;
-    });
-
-    it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
-      await service.passwordMatches(73, 'coop3r');
       expect(pool.test_client.release.calledOnce).to.be.true;
     });
   });

@@ -15,6 +15,13 @@ CREATE TABLE IF NOT EXISTS user_credentials (
   CONSTRAINT user_credentials_pk PRIMARY KEY (USER_RID)
 );
 
+CREATE TABLE IF NOT EXISTS password_reset_token (
+  USER_RID INTEGER NOT NULL REFERENCES users (ID),
+  TOKEN TEXT NOT NULL,
+  TIMESTAMP INTEGER NOT NULL,
+  CONSTRAINT password_reset_token_pk PRIMARY KEY (USER_RID)
+);
+
 DROP TRIGGER IF EXISTS bir_users ON users;
 DROP FUNCTION IF EXISTS bir_users();
 

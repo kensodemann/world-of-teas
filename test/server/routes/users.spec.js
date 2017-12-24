@@ -28,11 +28,36 @@ describe('route: /api/users', () => {
     save(user) {
       saveCalled++;
       saveCalledWith = user;
+
       if (user.id && !testData.find(item => item.id === user.id)) {
         return Promise.resolve();
       }
       const value = Object.assign({}, { id: 314159 }, user);
       return Promise.resolve(value);
+    }
+  }
+
+  let passwordCall;
+  let passwordError;
+  class MockPasswordService {
+    change(id, password, currentPassword) {
+      passwordCall.set('method', 'change');
+      passwordCall.set('id', id);
+      passwordCall.set('password', password);
+      passwordCall.set('currentPassword', currentPassword);
+      return passwordError
+        ? Promise.reject(new Error(passwordError))
+        : Promise.resolve();
+    }
+
+    reset(id, password, token) {
+      passwordCall.set('method', 'reset');
+      passwordCall.set('id', id);
+      passwordCall.set('password', password);
+      passwordCall.set('token', token);
+      return passwordError
+        ? Promise.reject(new Error(passwordError))
+        : Promise.resolve();
     }
   }
 
@@ -78,6 +103,7 @@ describe('route: /api/users', () => {
       }
     ];
     proxyquire('../../../server/routes/users', {
+      '../services/password': MockPasswordService,
       '../services/users': MockUserService
     })(app, auth, pool);
   });
@@ -436,6 +462,247 @@ describe('route: /api/users', () => {
             done();
           });
       });
+    });
+  });
+
+  describe('post change password', () => {
+    beforeEach(() => {
+      passwordCall = new Map();
+      passwordError = undefined;
+    });
+
+    it('requires an API login', done => {
+      mockJWT.verify.throws(new Error('no loggy loggy'));
+      request(app)
+        .post('/api/users/30/password')
+        .send({
+          password: 'IamNewPa$$worD',
+          currentPassword: 'iAmCurr3ntPassw0rd'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          expect(res.body).to.deep.equal({});
+          done();
+        });
+    });
+
+    it('calls change', done => {
+      request(app)
+        .post('/api/users/30/password')
+        .send({
+          password: 'IamNewPa$$worD',
+          currentPassword: 'iAmCurr3ntPassw0rd'
+        })
+        .end((err, res) => {
+          expect(passwordCall.get('method')).to.equal('change');
+          expect(passwordCall.get('id')).to.equal('30');
+          expect(passwordCall.get('password')).to.equal('IamNewPa$$worD');
+          expect(passwordCall.get('currentPassword')).to.equal(
+            'iAmCurr3ntPassw0rd'
+          );
+          done();
+        });
+    });
+
+    it('returns 200 on success', done => {
+      request(app)
+        .post('/api/users/30/password')
+        .send({
+          password: 'IamNewPa$$worD',
+          currentPassword: 'iAmCurr3ntPassw0rd'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    it('returns 400 on current password invalid', done => {
+      passwordError = 'Invalid password';
+      request(app)
+        .post('/api/users/30/password')
+        .send({
+          password: 'IamNewPa$$worD',
+          currentPassword: 'iAmCurr3ntPassw0rd'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body.reason).to.equal('Error: Invalid password');
+          done();
+        });
+    });
+
+    it('returns 500 on unknown failure', done => {
+      passwordError = 'The database went stupid on us';
+      request(app)
+        .post('/api/users/30/password')
+        .send({
+          password: 'IamNewPa$$worD',
+          currentPassword: 'iAmCurr3ntPassw0rd'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          expect(res.body.reason).to.equal('Unknown error');
+          done();
+        });
+    });
+
+    describe('with just a password', () => {
+      it('calls nothing', done => {
+        request(app)
+          .post('/api/users/30/password')
+          .send({
+            password: 'IamNewPa$$worD'
+          })
+          .end((err, res) => {
+            expect(passwordCall.get('method')).to.be.undefined;
+            done();
+          });
+      });
+
+      it('retuns 400', done => {
+        request(app)
+          .post('/api/users/30/password')
+          .send({
+            password: 'IamNewPa$$worD'
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(400);
+            done();
+          });
+      });
+    });
+
+    describe('with just a current password', () => {
+      it('calls nothing', done => {
+        request(app)
+          .post('/api/users/30/password')
+          .send({
+            currentPassword: 'iAmCurr3ntPassw0rd'
+          })
+          .end((err, res) => {
+            expect(passwordCall.get('method')).to.be.undefined;
+            done();
+          });
+      });
+
+      it('retuns 400', done => {
+        request(app)
+          .post('/api/users/30/password')
+          .send({
+            currentPassword: 'iAmCurr3ntPassw0rd'
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(400);
+            done();
+          });
+      });
+    });
+
+    it('returns 403 if not admin and not own user', done => {
+      mockJWT.verify.returns({
+        id: 10,
+        firstName: 'Fred',
+        lastName: 'Flintstone',
+        roles: ['user'],
+        iat: 'whatever',
+        exp: 19930124509912485
+      });
+      request(app)
+        .post('/api/users/42/password')
+        .send({
+          password: 'IamNewPa$$worD',
+          currentPassword: 'iAmCurr3ntPassw0rd'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          expect(res.body).to.deep.equal({});
+          done();
+        });
+    });
+  });
+
+  describe('post reset password', () => {
+    beforeEach(() => {
+      passwordCall = new Map();
+      passwordError = undefined;
+    });
+
+    it('calls reset', done => {
+      request(app)
+        .post('/api/users/30/password/38849950394ADEF45CF')
+        .send({
+          password: 'IamNewPa$$worD'
+        })
+        .end((err, res) => {
+          expect(passwordCall.get('method')).to.equal('reset');
+          expect(passwordCall.get('id')).to.equal('30');
+          expect(passwordCall.get('password')).to.equal('IamNewPa$$worD');
+          expect(passwordCall.get('token')).to.equal('38849950394ADEF45CF');
+          done();
+        });
+    });
+
+    it('returns 200 on success', done => {
+      request(app)
+        .post('/api/users/30/password/38849950394ADEF45CF')
+        .send({
+          password: 'IamNewPa$$worD'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          done();
+        });
+    });
+
+    it('returns 400 on invalid token', done => {
+      passwordError = 'Invalid token';
+      request(app)
+        .post('/api/users/30/password/38849950394ADEF45CF')
+        .send({
+          password: 'IamNewPa$$worD'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          done();
+        });
+    });
+
+    it('returns 400 on expired token', done => {
+      passwordError = 'Expired token';
+      request(app)
+        .post('/api/users/30/password/38849950394ADEF45CF')
+        .send({
+          password: 'IamNewPa$$worD'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          done();
+        });
+    });
+
+    it('returns 400 without password', done => {
+      request(app)
+        .post('/api/users/30/password/38849950394ADEF45CF')
+        .send({})
+        .end((err, res) => {
+          expect(passwordCall.get('method')).to.be.undefined;
+          expect(res.status).to.equal(400);
+          done();
+        });
+    });
+
+    it('returns 500 on unknown failure', done => {
+      passwordError = 'The database went stupid on us';
+      request(app)
+        .post('/api/users/30/password/38849950394ADEF45CF')
+        .send({
+          password: 'IamNewPa$$worD'
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          done();
+        });
     });
   });
 });

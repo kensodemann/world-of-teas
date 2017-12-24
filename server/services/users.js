@@ -1,7 +1,5 @@
 'use strict';
 
-const encryption = require('./encryption');
-
 const columns = 'id, first_name as "firstName", last_name as "lastName", email';
 
 module.exports = class Users {
@@ -45,16 +43,5 @@ module.exports = class Users {
     }
     client.release();
     return rtn.rows && rtn.rows[0];
-  }
-
-  async passwordMatches(id, password) {
-    const client = await this._pool.connect();
-    const data = await client.query(
-      'select * from user_credentials where id = $1',
-      [id]
-    );
-    const cred = data.rows && data.rows[0];
-    client.release();
-    return !!(cred && cred.password === encryption.hash(cred.salt, password));
   }
 };
