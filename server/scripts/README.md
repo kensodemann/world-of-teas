@@ -25,3 +25,7 @@ That should create all tables without error and populate the default data.
     1. INSERT data, update on conflict
     1. Special updates if required for ALTERs
     1. ALTER TABLE to add new constraints
+
+## First Time Use
+
+When creating a new database you will need to also create an initial user. Doing that is _not_ part of these scripts. See the `special` scripts and the documentation there for more details on how to do that.

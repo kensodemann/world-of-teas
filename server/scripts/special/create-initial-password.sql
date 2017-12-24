@@ -1,0 +1,2 @@
+INSERT INTO user_credentials(user_rid, password, salt)
+VALUES(:myid, '2b5d2c050dd40e66518b22552f4c52a506654c36', '4UaYXU85305dQYc4/Bz9F0pf+ZoSjOOS1m90WZQ0u231EfWNa8rwoxMdLf6Kkde1kG1dIXLGPfuETQl51z4PXTrdytCnMnJ7PP99e6BjWkLp4KWiQ0TD2Zg7X+txtJb1NwtHWXejkHjU0pN1lx/pUyM2L4Bi9Skf2aaCR50argY=');
