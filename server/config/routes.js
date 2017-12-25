@@ -9,6 +9,7 @@ module.exports = (app, pool) => {
 
   app.use('/', express.static(path.join(__dirname, '/../../dist')));
 
+  require('../routes/athentication')(app, auth);
   require('../routes/tea-categories')(app, pool);
   require('../routes/users')(app, auth, pool);
 };
