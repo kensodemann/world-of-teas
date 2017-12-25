@@ -20,10 +20,14 @@ module.exports = class Users {
   async get(id) {
     const client = await this._pool.connect();
     const data = await (/.*@.*/.test(id)
-      ? client.query(`select ${columns} from users where upper(email) = upper($1)`, [id])
+      ? client.query(
+        `select ${columns} from users where upper(email) = upper($1)`,
+        [id]
+      )
       : client.query(`select ${columns} from users where id = $1`, [id]));
     client.release();
-    const user = data.rows && data.rows[0];
+    const user =
+      data.rows && data.rows[0] ? Object.assign({}, data.rows[0]) : undefined;
     if (user) {
       user.roles = ['admin', 'user'];
     }
