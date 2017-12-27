@@ -3,10 +3,23 @@
 import Vue from 'vue';
 import VueResource from 'vue-resource';
 import VueResourceMock from 'vue-resource-mock';
+
+import BootstrapVue from 'bootstrap-vue';
+
 import App from './App';
 import router from './router';
 
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
 import testDataService from './assets/test-data/data-service';
+
+Vue.use(BootstrapVue);
+
+Vue.use(VueResource);
+if (process.env.NODE_ENV === 'testing') {
+  Vue.use(VueResourceMock, testDataService);
+}
 
 Vue.config.productionTip = false;
 
@@ -17,9 +30,3 @@ new Vue({
   template: '<App/>',
   components: { App }
 });
-
-Vue.use(VueResource);
-
-if (process.env.NODE_ENV === 'testing') {
-  Vue.use(VueResourceMock, testDataService);
-}

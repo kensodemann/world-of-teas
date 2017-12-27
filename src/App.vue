@@ -44,12 +44,9 @@ body {
 
 #main-header {
   flex: 0 0 auto;
-  height: 48px;
 }
-
 #main-content {
   flex: 1 1 auto;
-  position: relative; /* need this to position inner content */
   overflow-y: auto;
   margin-left: $standard-spacing;
   margin-right: $standard-spacing;

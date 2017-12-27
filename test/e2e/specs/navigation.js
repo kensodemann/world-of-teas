@@ -10,10 +10,7 @@ module.exports = {
       .assert.elementPresent('.home')
       .assert.containsText('h1', 'Home is Wherever the Tea Is')
       .assert.cssClassPresent('a[href="#/"', 'active')
-      .assert.cssClassNotPresent('a[href="#/categories"', 'active')
-      .assert.cssClassNotPresent('a[href="#/links"', 'active')
-      .assert.cssClassNotPresent('a[href="#/login"', 'active')
-      .assert.cssClassNotPresent('a[href="#/ratings"', 'active')
+      .assert.elementNotPresent('.active > .nav-link')
   },
 
   'categories': function(browser) {
@@ -23,10 +20,7 @@ module.exports = {
       .assert.elementPresent('.browse-by-category')
       .assert.containsText('h1', 'I Like to Browse by Category')
       .assert.cssClassNotPresent('a[href="#/"', 'active')
-      .assert.cssClassPresent('a[href="#/categories"', 'active')
-      .assert.cssClassNotPresent('a[href="#/links"', 'active')
-      .assert.cssClassNotPresent('a[href="#/login"', 'active')
-      .assert.cssClassNotPresent('a[href="#/ratings"', 'active')
+      .assert.containsText('.active > .nav-link', 'Categories')
   },
 
   'links': function(browser) {
@@ -36,10 +30,7 @@ module.exports = {
       .assert.elementPresent('.links')
       .assert.containsText('h1', 'Welcome to Your Vue.js App')
       .assert.cssClassNotPresent('a[href="#/"', 'active')
-      .assert.cssClassNotPresent('a[href="#/categories"', 'active')
-      .assert.cssClassPresent('a[href="#/links"', 'active')
-      .assert.cssClassNotPresent('a[href="#/login"', 'active')
-      .assert.cssClassNotPresent('a[href="#/ratings"', 'active')
+      .assert.containsText('.active > .nav-link', 'Links')
   },
 
   'login': function(browser) {
@@ -49,10 +40,7 @@ module.exports = {
       .assert.elementPresent('.login')
       .assert.containsText('h1', 'Login Page is Here')
       .assert.cssClassNotPresent('a[href="#/"', 'active')
-      .assert.cssClassNotPresent('a[href="#/categories"', 'active')
-      .assert.cssClassNotPresent('a[href="#/links"', 'active')
-      .assert.cssClassPresent('a[href="#/login"', 'active')
-      .assert.cssClassNotPresent('a[href="#/ratings"', 'active')
+      .assert.containsText('.active > .nav-link', 'Login')
   },
 
   'ratings': function(browser) {
@@ -62,10 +50,7 @@ module.exports = {
       .assert.elementPresent('.browse-by-rating')
       .assert.containsText('h1', 'I Like to Browse by Rating')
       .assert.cssClassNotPresent('a[href="#/"', 'active')
-      .assert.cssClassNotPresent('a[href="#/categories"', 'active')
-      .assert.cssClassNotPresent('a[href="#/links"', 'active')
-      .assert.cssClassNotPresent('a[href="#/login"', 'active')
-      .assert.cssClassPresent('a[href="#/ratings"', 'active')
+      .assert.containsText('.active > .nav-link', 'Ratings')
   },
 
   'back home': function(browser) {
@@ -75,10 +60,7 @@ module.exports = {
       .assert.elementPresent('.home')
       .assert.containsText('h1', 'Home is Wherever the Tea Is')
       .assert.cssClassPresent('a[href="#/"', 'active')
-      .assert.cssClassNotPresent('a[href="#/categories"', 'active')
-      .assert.cssClassNotPresent('a[href="#/links"', 'active')
-      .assert.cssClassNotPresent('a[href="#/login"', 'active')
-      .assert.cssClassNotPresent('a[href="#/ratings"', 'active')
+      .assert.elementNotPresent('.active > .nav-link')
       .end()
   }
 }
