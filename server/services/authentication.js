@@ -53,7 +53,7 @@ module.exports = class AuthenticationService {
 
   requireRole(role) {
     return (req, res, next) => {
-      const user = this._verifyToken(req);
+      const user = this.verifyToken(req);
       if (user.roles.find(r => r === role)) {
         next();
       } else {
@@ -65,7 +65,7 @@ module.exports = class AuthenticationService {
 
   requireRoleOrId(role) {
     return (req, res, next) => {
-      const user = this._verifyToken(req);
+      const user = this.verifyToken(req);
       if (user.id.toString() === req.params.id || user.roles.find(r => r === role)) {
         next();
       } else {
@@ -77,11 +77,16 @@ module.exports = class AuthenticationService {
 
   isAuthenticated(req) {
     try {
-      this._verifyToken(req);
+      this.verifyToken(req);
     } catch (err) {
       return false;
     }
     return true;
+  }
+
+  verifyToken(req) {
+    const currentToken = this._getCurrentToken(req);
+    return jwt.verify(currentToken, process.env.JWT_PRIVATE_KEY);
   }
 
   _generateToken(user) {
@@ -95,7 +100,7 @@ module.exports = class AuthenticationService {
   }
 
   _refreshToken(req, res) {
-    let user = this._verifyToken(req);
+    let user = this.verifyToken(req);
     delete user.exp;
     delete user.iat;
     const token = this._generateToken(user);
@@ -104,10 +109,5 @@ module.exports = class AuthenticationService {
       user: user,
       token: token
     });
-  }
-
-  _verifyToken(req) {
-    const currentToken = this._getCurrentToken(req);
-    return jwt.verify(currentToken, process.env.JWT_PRIVATE_KEY);
   }
 };

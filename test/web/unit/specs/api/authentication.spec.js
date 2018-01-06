@@ -1,3 +1,5 @@
+'use strict';
+
 import authentication from '@/api/authentication';
 import loginData from '@/assets/test-data/login';
 

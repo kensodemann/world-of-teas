@@ -9,18 +9,20 @@
 <script>
 import MainHeader from './components/main-header';
 import MainFooter from './components/main-footer';
+import store from './store';
 
 export default {
   name: 'app',
   components: {
     MainHeader,
     MainFooter
-  }
+  },
+  store: store
 };
 </script>
 
 <style lang="scss">
-@import "./scss/theme";
+@import './scss/theme';
 
 html,
 body,

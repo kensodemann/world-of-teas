@@ -1,3 +1,5 @@
+'use strict';
+
 import teaCategories from '@/api/tea-categories';
 import testTeaCategories from '@/assets/test-data/tea-categories';
 

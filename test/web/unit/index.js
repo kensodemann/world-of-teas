@@ -1,3 +1,5 @@
+'use strict';
+
 import BootstrapVue from 'bootstrap-vue';
 import VeeValidate from 'vee-validate';
 import Vue from 'vue';
@@ -5,11 +7,13 @@ import VueResource from 'vue-resource';
 import VueResourceMock from 'vue-resource-mock';
 
 import MockRouter from './mocks/mock-router';
+import MockStore from './mocks/mock-store';
 import testDataService from '@/assets/test-data/data-service';
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(MockRouter);
+Vue.use(MockStore);
 Vue.use(VeeValidate);
 Vue.use(VueResource);
 Vue.use(VueResourceMock, testDataService, { silent: true });

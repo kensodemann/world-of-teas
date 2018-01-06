@@ -1,3 +1,5 @@
+'use strict';
+
 import Vue from 'vue';
 
 import Page from '@/components/pages/browse-by-category';

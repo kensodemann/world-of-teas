@@ -56,8 +56,6 @@
 </template>
 
 <script>
-import authentication from '../../api/authentication';
-
 export default {
   data() {
     return {
@@ -72,10 +70,10 @@ export default {
 
   methods: {
     async login() {
-      const res = await authentication.login(
-        this.form.email,
-        this.form.password
-      );
+      const res = await this.$store.dispatch('identity/login', {
+        username: this.form.email,
+        password: this.form.password
+      });
       if (res.success) {
         this.form.email = '';
         this.$router.replace('/');

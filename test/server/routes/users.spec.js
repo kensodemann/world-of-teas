@@ -21,7 +21,7 @@ describe('route: /api/users', () => {
     }
 
     get(id) {
-      const value = testData.find(item => item.id.toString() === id);
+      const value = testData.find(item => item.id.toString() === id.toString());
       return Promise.resolve(value);
     }
 
@@ -100,6 +100,12 @@ describe('route: /api/users', () => {
         id: 40,
         firstName: 'Betty',
         lastName: 'Rubble'
+      },
+      {
+        id: 1138,
+        firstName: 'Teddy',
+        lastName: 'Senspeck',
+        roles: ['admin']
       }
     ];
     proxyquire('../../../server/routes/users', {
@@ -128,6 +134,34 @@ describe('route: /api/users', () => {
           expect(res.body).to.deep.equal(testData);
           done();
         });
+    });
+
+    describe('with "current"', () => {
+      it('requires an API login', done => {
+        mockJWT.verify.throws(new Error('no loggy loggy'));
+        request(app)
+          .get('/api/users/current')
+          .end((err, res) => {
+            expect(res.status).to.equal(401);
+            expect(res.body).to.deep.equal({});
+            done();
+          });
+      });
+
+      it('returns the current user', done => {
+        request(app)
+          .get('/api/users/current')
+          .end((err, res) => {
+            expect(res.status).to.equal(200);
+            expect(res.body).to.deep.equal({
+              id: 1138,
+              firstName: 'Teddy',
+              lastName: 'Senspeck',
+              roles: ['admin']
+            });
+            done();
+          });
+      });
     });
 
     describe('with an id', () => {
