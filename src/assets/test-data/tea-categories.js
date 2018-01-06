@@ -1,3 +1,5 @@
+'use strict';
+
 export default [
   {
     id: 1,

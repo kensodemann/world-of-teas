@@ -1,17 +1,18 @@
 import Vue from 'vue';
+
 import Component from '@/components/main-header';
 
 describe('main-header.vue', () => {
   it('should render the brand', () => {
     const vm = mountRoutedComponent();
-    const links = vm.$el.querySelectorAll('b-navbar-brand');
+    const links = vm.$el.querySelectorAll('.navbar-brand');
     expect(links.length).to.equal(1);
     expect(links[0].textContent).to.equal('World of Teas');
   });
 
   it('should render correct links', () => {
     const vm = mountRoutedComponent();
-    const links = vm.$el.querySelectorAll('b-nav-item');
+    const links = vm.$el.querySelectorAll('.nav-item');
     expect(links.length).to.equal(4);
     expect(links[0].textContent).to.equal('Categories');
     expect(links[1].textContent).to.equal('Ratings');

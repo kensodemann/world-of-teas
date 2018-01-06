@@ -1,13 +1,7 @@
 import Vue from 'vue';
-import VueResource from 'vue-resource';
-import VueResourceMock from 'vue-resource-mock';
+
 import Page from '@/components/pages/browse-by-category';
-
-import testDataService from '@/assets/test-data/data-service';
 import testTeaCategories from '@/assets/test-data/tea-categories';
-
-Vue.use(VueResource);
-Vue.use(VueResourceMock, testDataService, { silent: true });
 
 describe('browse-by-category.vue', () => {
   let vm;
