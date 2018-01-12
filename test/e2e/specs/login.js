@@ -64,10 +64,6 @@ module.exports = {
     browser.setValue('#loginPasswordInput', 'TheValidPa$$w0rd');
     browser.click('button[type="submit"]');
     browser.expect.element('.home').to.be.present;
-    browser.click('a[href="#/login"]');
-    browser.expect.element('#loginEmailInput').to.have.value.that.equals('');
-    browser.expect.element('#loginPasswordInput').to.have.value.that.equals('');
-    browser.expect.element('#error-message').text.to.equal('');
   },
 
   end: function(browser) {

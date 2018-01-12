@@ -19,6 +19,18 @@ module.exports = (app, auth, pool) => {
     }
   );
 
+  app.get('/api/users/current', auth.requireApiLogin.bind(auth), (req, res) => {
+    (async () => {
+      const u = auth.verifyToken(req);
+      const user = await users.get(u.id);
+      if (!user) {
+        res.status(404);
+        res.end();
+      }
+      res.send(user);
+    })().catch(e => console.error(e.stack));
+  });
+
   app.get(
     '/api/users/:id',
     auth.requireApiLogin.bind(auth),

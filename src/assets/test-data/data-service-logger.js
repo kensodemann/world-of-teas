@@ -16,6 +16,4 @@ class DataServiceLogger {
   }
 }
 
-const logger = new DataServiceLogger();
-
-export default logger;
+export default new DataServiceLogger();

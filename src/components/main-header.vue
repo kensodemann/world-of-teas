@@ -12,7 +12,13 @@
       <b-nav-item href="#/links" v-bind:class="{active: $route.name === 'Links'}">Links</b-nav-item>
     </b-navbar-nav>
 
-    <b-navbar-nav class="ml-auto">
+    <b-navbar-nav class="ml-auto" v-if="identity">
+      <b-nav-item-dropdown :text="identity">
+        <b-dropdown-item href="#/profile" v-bind:class="{active: $route.name === 'My Profile'}">My Profile</b-dropdown-item>
+        <b-dropdown-item href="#">Logout</b-dropdown-item>
+      </b-nav-item-dropdown>
+    </b-navbar-nav>
+    <b-navbar-nav class="ml-auto" v-else>
       <b-nav-item href="#/login" v-bind:class="{active: $route.name === 'Login'}">Login</b-nav-item>
     </b-navbar-nav>
   </b-collapse>
@@ -20,5 +26,11 @@
 </template>
 
 <script>
-export default {};
+import { mapGetters } from 'vuex';
+
+export default {
+  computed: mapGetters({
+    identity: 'identity/name'
+  })
+};
 </script>

@@ -1,4 +1,5 @@
-import sinon from 'sinon';
+'use strict';
+
 import Vue from 'vue';
 
 import logger from '@/assets/test-data/data-service-logger';
@@ -23,26 +24,31 @@ describe('login.vue', () => {
       const Constructor = Vue.extend(Page);
       vm = new Constructor().$mount();
       sinon.spy(vm.$router, 'replace');
+      sinon.stub(vm.$store, 'dispatch');
+      vm.$store.dispatch.returns(Promise.resolve({ success: false }));
     });
 
     afterEach(() => {
       vm.$router.replace.restore();
+      vm.$store.dispatch.restore();
     });
 
     it('should perform a login', async () => {
       vm.form.email = 'testlogin@test.org';
       vm.form.password = 'this.is.a.test';
       vm.login();
-      expect(logger.requests.length).to.equal(1);
-      expect(logger.requests[0].body).to.deep.equal({
-        username: 'testlogin@test.org',
-        password: 'this.is.a.test'
-      });
-      await Vue.nextTick();
+      expect(vm.$store.dispatch.calledOnce).to.be.true;
+      expect(
+        vm.$store.dispatch.calledWith('identity/login', {
+          username: 'testlogin@test.org',
+          password: 'this.is.a.test'
+        })
+      ).to.be.true;
     });
 
     describe('on success', () => {
       beforeEach(() => {
+        vm.$store.dispatch.returns(Promise.resolve({ success: true }));
         vm.form.email = 'testlogin@test.org';
         vm.form.password = 'TheValidPa$$w0rd';
       });
@@ -64,6 +70,7 @@ describe('login.vue', () => {
 
     describe('on failure', () => {
       beforeEach(() => {
+        vm.$store.dispatch.returns(Promise.resolve({ success: false }));
         vm.form.email = 'testlogin@test.org';
         vm.form.password = 'PleaseFailMe';
       });

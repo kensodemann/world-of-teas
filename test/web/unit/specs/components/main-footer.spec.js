@@ -1,3 +1,5 @@
+'use strict';
+
 import Vue from 'vue';
 import Component from '@/components/main-footer';
 import moment from 'moment';
