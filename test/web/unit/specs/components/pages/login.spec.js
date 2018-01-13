@@ -1,13 +1,12 @@
 'use strict';
 
 import Vue from 'vue';
-
 import Page from '@/components/pages/login';
+import util from '../../../util';
 
 describe('login.vue', () => {
   it('should render correct contents', () => {
-    const Constructor = Vue.extend(Page);
-    const vm = new Constructor().$mount();
+    const vm = util.mountComponent(Page);
     expect(vm.$el.querySelector('#loginEmailGroup label').textContent).to.equal(
       'Email address:'
     );
@@ -19,8 +18,7 @@ describe('login.vue', () => {
   describe('login', () => {
     let vm;
     beforeEach(() => {
-      const Constructor = Vue.extend(Page);
-      vm = new Constructor().$mount();
+      vm = util.mountComponent(Page);
       sinon.spy(vm.$router, 'replace');
       sinon.stub(vm.$store, 'dispatch');
       vm.$store.dispatch.returns(Promise.resolve({ success: false }));

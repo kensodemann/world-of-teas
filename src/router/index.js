@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import BrowseByCategory from '@/components/pages/browse-by-category';
 import BrowseByRating from '@/components/pages/browse-by-rating';
+import ChangePassword from '@/components/pages/change-password';
 import Home from '@/components/pages/home';
 import Links from '@/components/pages/links';
 import Login from '@/components/pages/login';
@@ -14,6 +15,11 @@ export default new Router({
       path: '/categories',
       name: 'Categories',
       component: BrowseByCategory
+    },
+    {
+      path: '/change-password',
+      name: 'Change Password',
+      component: ChangePassword
     },
     {
       path: '/links',

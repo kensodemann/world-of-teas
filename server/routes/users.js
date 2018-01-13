@@ -97,7 +97,7 @@ module.exports = (app, auth, pool) => {
             pwd.password,
             pwd.currentPassword
           );
-          res.send();
+          res.send({ success: true });
         } catch (err) {
           const msg = err.toString();
           if (/Error: Invalid/.test(msg)) {

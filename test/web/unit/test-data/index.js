@@ -19,11 +19,21 @@ class TestData {
   }
 
   setResponse(endpoint, response) {
-    Vue.http.get.withArgs(endpoint).returns(Promise.resolve(response));
+    Vue.http.get
+      .withArgs(endpoint)
+      .returns(
+        response.status >= 400
+          ? Promise.reject(response)
+          : Promise.resolve(response)
+      );
   }
 
   setPostResponse(endpoint, response) {
-    Vue.http.post.withArgs(endpoint).returns(Promise.resolve(response));
+    if (response.status && response.status >= 400) {
+      Vue.http.post.withArgs(endpoint).returns(Promise.reject(response));
+    } else {
+      Vue.http.post.withArgs(endpoint).returns(Promise.resolve(response));
+    }
   }
 
   teaCategories = [
