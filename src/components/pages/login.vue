@@ -18,30 +18,16 @@
 
       <b-form-group id="loginPasswordGroup"
                     label="Password:"
-                    label-for="loginPasswordInput"
-                    v-show="!showPassword">
-        <b-form-input id="loginPasswordInput"
-                      name="loginPasswordInput"
-                      data-vv-as="password"
-                      type="password"
-                      v-model="form.password"
-                      required
-                      v-validate="'required'"
-                      placeholder="Password">
-        </b-form-input>
-        <small class="text-danger" v-show="errors.has('loginPasswordInput')">{{ errors.first('loginPasswordInput') }}</small>
-      </b-form-group>
-
-      <b-form-group id="loginPasswordShowGroup"
-                    label="Password:"
-                    label-for="loginPasswordShowInput"
-                    v-show="showPassword">
-        <b-form-input id="loginPasswordShowInput"
-                      type="text"
-                      v-model="form.password"
-                      required
-                      placeholder="Password">
-        </b-form-input>
+                    label-for="loginPasswordInput">
+        <password-input id="loginPasswordInput"
+                        name="loginPasswordInput"
+                        data-vv-as="password"
+                        v-model="form.password"
+                        required
+                        v-validate="'required'"
+                        placeholder="Enter Password"
+                        :show-password="showPassword">
+        </password-input>
         <small class="text-danger" v-show="errors.has('loginPasswordInput')">{{ errors.first('loginPasswordInput') }}</small>
       </b-form-group>
 
@@ -56,7 +42,13 @@
 </template>
 
 <script>
+import PasswordInput from '../password-input';
+
 export default {
+  components: {
+    PasswordInput
+  },
+
   data() {
     return {
       form: {
