@@ -1,7 +1,8 @@
 'use strict';
 
+import Vue from 'vue';
 import users from '@/api/users';
-import usersData from '@/assets/test-data/users';
+import testData from '../../test-data';
 
 describe('users', () => {
   it('exists', () => {
@@ -9,11 +10,35 @@ describe('users', () => {
   });
 
   describe('current', () => {
-    it('gets the current user', () => {
-      return users.current().then(res => {
-        let expected = JSON.parse(JSON.stringify(usersData.current));
-        expect(res).to.deep.equal(expected);
+    const currentUser = {
+      id: 1138,
+      firstName: 'Jackson',
+      lastName: 'Josephini',
+      email: 'jj@test.org',
+      roles: ['admin', 'user']
+    };
+
+    beforeEach(() => {
+      testData.initialize();
+      testData.setResponse('/api/users/current', {
+        status: 200,
+        body: currentUser
       });
+    });
+
+    afterEach(() => {
+      testData.restore();
+    });
+
+    it('gets the current user', async () => {
+      await users.current();
+      expect(Vue.http.get.calledOnce).to.be.true;
+      expect(Vue.http.get.calledWith('/api/users/current')).to.be.true;
+    });
+
+    it('unpacks the body of the response', async () => {
+      const res = await users.current();
+      expect(res).to.deep.equal(currentUser);
     });
   });
 });

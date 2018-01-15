@@ -3,13 +3,18 @@
 import Vue from 'vue';
 
 import Page from '@/components/pages/browse-by-category';
-import testTeaCategories from '@/assets/test-data/tea-categories';
+import testData from '../../../test-data';
 
 describe('browse-by-category.vue', () => {
   let vm;
   beforeEach(() => {
+    testData.initialize();
     const Constructor = Vue.extend(Page);
     vm = new Constructor().$mount();
+  });
+
+  afterEach(() => {
+    testData.restore();
   });
 
   it('should render correct title', () => {
@@ -20,7 +25,7 @@ describe('browse-by-category.vue', () => {
 
   it('should fetch the tea categories', () => {
     return Vue.nextTick().then(() => {
-      expect(vm.categories).to.deep.equal(testTeaCategories);
+      expect(vm.categories).to.deep.equal(testData.teaCategories);
     });
   });
 

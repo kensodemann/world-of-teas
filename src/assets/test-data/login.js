@@ -7,7 +7,7 @@ module.exports = {
       id: 42,
       firstName: 'Testy',
       lastName: 'McTersterson',
-      email: undefined,
+      email: 'something@test.org',
       roles: ['admin', 'user']
     },
     token: 'this would be a valid token'

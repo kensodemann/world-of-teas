@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import teaCategories from '../../api/tea-categories';
+import teaCategories from '@/api/tea-categories';
 
 export default {
   data: function() {
