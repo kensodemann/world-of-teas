@@ -17,7 +17,10 @@ export default {
     MainHeader,
     MainFooter
   },
-  store: store
+  store: store,
+  created: function() {
+    store.dispatch('identity/refresh');
+  }
 };
 </script>
 

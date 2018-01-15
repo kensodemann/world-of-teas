@@ -8,6 +8,7 @@ import VueResourceMock from 'vue-resource-mock';
 
 import App from './App';
 import router from './router';
+import store from './store';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -21,6 +22,13 @@ Vue.use(VueResource);
 if (process.env.NODE_ENV === 'testing') {
   Vue.use(VueResourceMock, testDataService);
 }
+
+Vue.http.interceptors.push(function(req, next) {
+  if (store.state && store.state.identity && store.state.identity.token) {
+    req.headers.set('Authorization', `Bearer ${store.state.identity.token}`);
+  }
+  next();
+});
 
 Vue.config.productionTip = false;
 
