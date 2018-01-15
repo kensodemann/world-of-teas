@@ -2,7 +2,6 @@
 
 import Vue from 'vue';
 
-import logger from '@/assets/test-data/data-service-logger';
 import Page from '@/components/pages/login';
 
 describe('login.vue', () => {
@@ -20,7 +19,6 @@ describe('login.vue', () => {
   describe('login', () => {
     let vm;
     beforeEach(() => {
-      logger.reset();
       const Constructor = Vue.extend(Page);
       vm = new Constructor().$mount();
       sinon.spy(vm.$router, 'replace');
