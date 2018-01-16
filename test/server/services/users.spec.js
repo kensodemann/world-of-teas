@@ -186,7 +186,7 @@ describe('service: users', () => {
         });
         expect(pool.test_client.query.calledOnce).to.be.true;
         const sql = pool.test_client.query.args[0][0];
-        expect(/^update users.*where id = \$1 returning \*/.test(sql)).to.be
+        expect(/^update users.*where id = \$1 returning id, first_name as "firstName",/.test(sql)).to.be
           .true;
       });
 
@@ -251,7 +251,7 @@ describe('service: users', () => {
         });
         expect(pool.test_client.query.calledOnce).to.be.true;
         const sql = pool.test_client.query.args[0][0];
-        expect(/^insert into users.*returning \*/.test(sql)).to.be.true;
+        expect(/^insert into users.*returning id, first_name as "firstName",/.test(sql)).to.be.true;
       });
 
       it('creates an initial password', async () => {

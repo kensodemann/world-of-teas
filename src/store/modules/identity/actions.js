@@ -17,7 +17,7 @@ export default {
   async refresh({ commit }) {
     const token = localStorage.getItem('world-of-teas.token');
     if (token) {
-      commit('login', {token});
+      commit('login', { token });
       const user = await users.current();
       if (user && user.id) {
         commit('login', { token, user });
@@ -25,5 +25,10 @@ export default {
         commit('logout');
       }
     }
+  },
+
+  async save({ commit }, user) {
+    const savedUser = await users.save(user);
+    commit('user', savedUser);
   }
 };

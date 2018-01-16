@@ -154,7 +154,7 @@ describe('identity action', () => {
 
       it('commits a logout mutation if there is no user', async () => {
         users.current.returns({});
-        await actions.refresh({commit});
+        await actions.refresh({ commit });
         expect(commit.calledTwice).to.be.true;
         expect(commit.calledWith('logout')).to.be.true;
       });
@@ -162,10 +162,70 @@ describe('identity action', () => {
 
     describe('when no token exists', () => {
       it('does not attempt to get a current user', async () => {
-        await actions.refresh({commit});
+        await actions.refresh({ commit });
         expect(commit.called).to.be.false;
         expect(users.current.called).to.be.false;
       });
+    });
+  });
+
+  describe('save', () => {
+    beforeEach(() => {
+      sinon.stub(users, 'save');
+    });
+
+    afterEach(() => {
+      users.save.restore();
+    });
+
+    it('saves the passed user information', async () => {
+      await actions.save(
+        { commit },
+        {
+          id: 73,
+          firstName: 'Shelly',
+          lastName: 'Cooper',
+          email: 'smelly.pooper@caltech.edu'
+        }
+      );
+      expect(users.save.calledOnce).to.be.true;
+      expect(
+        users.save.calledWith({
+          id: 73,
+          firstName: 'Shelly',
+          lastName: 'Cooper',
+          email: 'smelly.pooper@caltech.edu'
+        })
+      ).to.be.true;
+    });
+
+    it('commits the change if the save succeeds', async () => {
+      users.save.returns(
+        Promise.resolve({
+          id: 73,
+          firstName: 'Shelly',
+          lastName: 'Cooper',
+          email: 'saved.smelly.pooper@caltech.edu'
+        })
+      );
+      await actions.save(
+        { commit },
+        {
+          id: 73,
+          firstName: 'Shelly',
+          lastName: 'Cooper',
+          email: 'smelly.pooper@caltech.edu'
+        }
+      );
+      expect(commit.calledOnce).to.be.true;
+      expect(
+        commit.calledWith('user', {
+          id: 73,
+          firstName: 'Shelly',
+          lastName: 'Cooper',
+          email: 'saved.smelly.pooper@caltech.edu'
+        })
+      ).to.be.true;
     });
   });
 });
