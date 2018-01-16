@@ -6,12 +6,10 @@ import Vue from 'vue';
 import VueResource from 'vue-resource';
 
 import MockRouter from './mocks/mock-router';
-import MockStore from './mocks/mock-store';
 
 Vue.config.productionTip = false;
 Vue.use(BootstrapVue);
 Vue.use(MockRouter);
-Vue.use(MockStore);
 Vue.use(VeeValidate);
 Vue.use(VueResource);
 
