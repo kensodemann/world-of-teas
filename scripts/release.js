@@ -126,7 +126,7 @@ function runTasks(oldVersion, inc) {
     },
     {
       title: 'Committing',
-      task: () => execa('git', ['commit', `-m chore(release): release ${newVersion}`], { cwd: rootDir })
+      task: () => execa('git', ['commit', `-am chore(release): release ${newVersion}`], { cwd: rootDir })
     },
     {
       title: 'Tagging',
