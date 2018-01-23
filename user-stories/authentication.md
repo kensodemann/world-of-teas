@@ -3,18 +3,18 @@
 ## Tasks
 
 ### All Users
-- Logging In
-- Logging Out
-- Viewing My Profile
-- Editing My Profile
-- Changing My Password
-- Resetting a Forgotten Password
+- [x] Logging In
+- [ ] Logging Out
+- [x] Viewing My Profile
+- [x] Editing My Profile
+- [x] Changing My Password
+- [ ] Resetting a Forgotten Password
 
 ### Administrators
-- View all users
-- Add user
-- Enable/Disable user
-- Change User Password
+- [ ] View all users
+- [ ] Add user
+- [ ] Enable/Disable user
+- [ ] Change User Password
 
 ## Task: Logging In
 
