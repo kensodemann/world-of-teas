@@ -47,13 +47,68 @@ describe('users', () => {
 
   describe('change password', () => {
     it('posts to the change password', async () => {
-      testData.setPostResponse('/api/users/42/password', { status: 200 });
+      testData.setPostResponse('/api/users/42/password', {
+        status: 200,
+        body: { status: 200 }
+      });
       await users.changePassword(42, 'myOldPassword', 'myShinyNewPassword');
       expect(Vue.http.post.calledOnce).to.be.true;
       expect(
         Vue.http.post.calledWith('/api/users/42/password', {
           currentPassword: 'myOldPassword',
           password: 'myShinyNewPassword'
+        })
+      ).to.be.true;
+    });
+  });
+
+  describe('save', () => {
+    it('posts new users', async () => {
+      testData.setPostResponse('/api/users', {
+        status: 200,
+        body: {
+          id: 73,
+          firstName: 'Sheldon',
+          lastName: 'Copper',
+          email: 'smelly.pooper@caltech.edu'
+        }
+      });
+      await users.save({
+        firstName: 'Sheldon',
+        lastName: 'Copper',
+        email: 'smelly.pooper@caltech.edu'
+      });
+      expect(
+        Vue.http.post.calledWith('/api/users', {
+          firstName: 'Sheldon',
+          lastName: 'Copper',
+          email: 'smelly.pooper@caltech.edu'
+        })
+      ).to.be.true;
+    });
+
+    it('posts changes to existing users', async () => {
+      testData.setPostResponse('/api/users/73', {
+        status: 200,
+        body: {
+          id: 73,
+          firstName: 'Shelly',
+          lastName: 'Smith',
+          email: 'shells@test.org'
+        }
+      });
+      await users.save({
+        id: 73,
+        firstName: 'Sheldon',
+        lastName: 'Copper',
+        email: 'smelly.pooper@caltech.edu'
+      });
+      expect(
+        Vue.http.post.calledWith('/api/users/73', {
+          id: 73,
+          firstName: 'Sheldon',
+          lastName: 'Copper',
+          email: 'smelly.pooper@caltech.edu'
         })
       ).to.be.true;
     });

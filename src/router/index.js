@@ -6,6 +6,7 @@ import ChangePassword from '@/components/pages/change-password';
 import Home from '@/components/pages/home';
 import Links from '@/components/pages/links';
 import Login from '@/components/pages/login';
+import Profile from '@/components/pages/profile';
 
 Vue.use(Router);
 
@@ -30,6 +31,11 @@ export default new Router({
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/profile',
+      name: 'My Profile',
+      component: Profile
     },
     {
       path: '/ratings',

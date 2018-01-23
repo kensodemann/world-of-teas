@@ -85,4 +85,46 @@ describe('identity mutation', () => {
       expect(state.user).to.deep.equal({});
     });
   });
+
+  describe('user', () => {
+    let state;
+    beforeEach(() => {
+      state = {
+        user: {
+          id: 42,
+          firstName: 'Douglas',
+          lastName: 'Adams',
+          email: 'deep.thought@test.org'
+        },
+        token: '3499iiigoie95030'
+      };
+    });
+
+    it('sets the firstName', () => {
+      mutations.user(state, {
+        firstName: 'Jimmy',
+        lastName: 'Johnson',
+        email: 'jj@nascar.com'
+      });
+      expect(state.user.firstName).to.equal('Jimmy');
+    });
+
+    it('sets the lastName', () => {
+      mutations.user(state, {
+        firstName: 'Jimmy',
+        lastName: 'Johnson',
+        email: 'jj@nascar.com'
+      });
+      expect(state.user.lastName).to.equal('Johnson');
+    });
+
+    it('sets the email', () => {
+      mutations.user(state, {
+        firstName: 'Jimmy',
+        lastName: 'Johnson',
+        email: 'jj@nascar.com'
+      });
+      expect(state.user.email).to.equal('jj@nascar.com');
+    });
+  });
 });

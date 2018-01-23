@@ -33,6 +33,29 @@ export default {
       statusText: 'OK'
     };
   },
+  ['POST /api/users/:id'](pathMatch, query, request) {
+    logger.log(pathMatch, query, request);
+    return {
+      body: request.body,
+      status: 200,
+      statusText: 'OK'
+    };
+  },
+  ['POST /api/users/42/password'](pathMatch, query, request) {
+    logger.log(pathMatch, query, request);
+    if (request.body && request.body.currentPassword === 'TheValidPa$$w0rd') {
+      return {
+        body: { success: true },
+        status: 200,
+        statusText: 'OK'
+      };
+    } else {
+      return {
+        body: { reason: 'Error: Invalid Password.' },
+        status: 400
+      };
+    }
+  },
   ['GET /api/users/current'](pathMatch, query, request) {
     const body = users.current;
     logger.log(pathMatch, query, request);

@@ -14,5 +14,10 @@ export default {
         password: newPassword
       })
       .then(res => res.body);
+  },
+
+  save(user) {
+    const url = '/api/users' + (user.id ? `/${user.id}` : '');
+    return Vue.http.post(url, user).then(res => res.body);
   }
 };
