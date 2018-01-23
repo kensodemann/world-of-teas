@@ -15,7 +15,7 @@
     <b-navbar-nav class="ml-auto" v-if="identity">
       <b-nav-item-dropdown :text="identity">
         <b-dropdown-item href="#/profile" v-bind:class="{active: $route.name === 'My Profile'}">My Profile</b-dropdown-item>
-        <b-dropdown-item href="#">Logout</b-dropdown-item>
+        <b-dropdown-item id="logout-button" href="#" @click="logout()">Logout</b-dropdown-item>
       </b-nav-item-dropdown>
     </b-navbar-nav>
     <b-navbar-nav class="ml-auto" v-else>
@@ -31,6 +31,12 @@ import { mapGetters } from 'vuex';
 export default {
   computed: mapGetters({
     identity: 'identity/name'
-  })
+  }),
+  methods: {
+    logout() {
+      console.log('doing a logout');
+      return this.$store.dispatch('identity/logout');
+    }
+  }
 };
 </script>

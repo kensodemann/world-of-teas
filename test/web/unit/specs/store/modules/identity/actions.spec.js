@@ -94,7 +94,27 @@ describe('identity action', () => {
     });
   });
 
-  describe('logout', () => {});
+  describe('logout', () => {
+    beforeEach(() => {
+      sinon.stub(authentication, 'logout');
+      authentication.logout.returns(Promise.resolve());
+    });
+
+    afterEach(() => {
+      authentication.logout.restore();
+    });
+
+    it('calls authentication service logout', async () => {
+      await actions.logout({ commit });
+      expect(authentication.logout.calledOnce).to.be.true;
+    });
+
+    it('commits the logout', async () => {
+      await actions.logout({ commit });
+      expect(commit.calledOnce).to.be.true;
+      expect(commit.calledWith('logout')).to.be.true;
+    });
+  });
 
   describe('refresh', () => {
     beforeEach(() => {

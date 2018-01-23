@@ -54,4 +54,23 @@ describe('authentication', () => {
       expect(res).to.deep.equal(expected);
     });
   });
+
+  describe('logout', () => {
+    beforeEach(() => {
+      testData.initialize();
+      testData.setPostResponse('/api/logout', {
+        status: 200
+      });
+    });
+
+    afterEach(() => {
+      testData.restore();
+    });
+
+    it('posts to the logout endpoint', async () => {
+      await authentication.logout();
+      expect(Vue.http.post.calledOnce).to.be.true;
+      expect(Vue.http.post.calledWith('/api/logout')).to.be.true;
+    });
+  });
 });

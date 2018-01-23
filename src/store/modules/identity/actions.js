@@ -12,7 +12,10 @@ export default {
     return res;
   },
 
-  logout({ commit, state }) {},
+  async logout({commit, state}) {
+    await authentication.logout();
+    commit('logout');
+  },
 
   async refresh({ commit }) {
     const token = localStorage.getItem('world-of-teas.token');

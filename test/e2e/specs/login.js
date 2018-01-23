@@ -56,6 +56,7 @@ module.exports = {
   },
 
   submit: function(browser) {
+    browser.expect.element('a[href="#/login"]').to.be.present;
     browser.setValue('#loginPasswordInput input[type="password"]', 'NotTheValidPa$$w0rd');
     browser.click('button[type="submit"]');
     browser.expect
@@ -64,6 +65,16 @@ module.exports = {
     browser.setValue('#loginPasswordInput input[type="password"]', 'TheValidPa$$w0rd');
     browser.click('button[type="submit"]');
     browser.expect.element('.home').to.be.present;
+    browser.expect
+      .element('.dropdown-toggle')
+      .text.to.equal('Testy McTersterson');
+    browser.expect.element('a[href="#/login"]').to.not.be.present;
+  },
+
+  logout: function(browser) {
+    browser.click('.dropdown-toggle');
+    browser.click('#logout-button');
+    browser.expect.element('a[href="#/login"]').to.be.present;
   },
 
   end: function(browser) {
