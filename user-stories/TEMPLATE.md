@@ -4,13 +4,13 @@
 
 ### All Users
 
-- one
-- two
+- [ ] one
+- [ ] two
 
 ### Administrators
 
-- one
-- two
+- [ ] one
+- [ ] two
 
 ## Task: XXX
 

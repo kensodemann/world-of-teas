@@ -23,7 +23,7 @@ A user login is required in order to modify data. It is not generally required i
 ### Pages
 - Login
 - Current Application Page
-- Home /Search
+- Home / Search
 
 ### User Steps
 
@@ -60,8 +60,10 @@ In cases where the user went directly to the login page they shall be redirected
 
 ### User Steps
 
-1. User presses the logout link in the navigation bar
-1. User is asked if they would like to log out via a dialog box
+1. Logged in user clicks on their name in the navigation bar
+1. A menu drops down having two options: My Profile, and Logout
+1. User Selects Logout
+1. User is asked if they would like to log out via a dialog box (not currently done, not sure required, will take some testing with the application as-is to determine)
 1. User presses yes or no
 
 ### Results
@@ -83,6 +85,8 @@ The user stays on the screen that that are on. The ask dialog is dismissed.
 ### User Steps
 
 1. Logged in user clicks on their name in the navigation bar
+1. A menu drops down having two options: My Profile, and Logout
+1. User Selects My Profile
 
 ### Result
 
@@ -97,6 +101,8 @@ The profile page for the currently logged in user is displayed. This page displa
 ### User Steps
 
 1. Logged in user clicks on their name in the navigation bar
+1. A menu drops down having two options: My Profile, and Logout
+1. User Selects My Profile
 1. User makes changes from within the User Profile Page
 1. User performs one of the following actions
    1. Presses Save Button
@@ -139,6 +145,8 @@ If there are unsaved modifications on the page, the user shall be asked if they 
 ### User Steps
 
 1. User clicks their name in the navigation bar to go to the user profile page
+1. A menu drops down having two options: My Profile, and Logout
+1. User Selects My Profile
 1. User clicks the "Change Password" button
 1. User enters current password, new password, and confirmation of new password
 1. User clicks "Change Password" button to perform the change or "Cancel" to leave without changing the password
