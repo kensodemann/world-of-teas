@@ -34,7 +34,6 @@ export default {
   }),
   methods: {
     logout() {
-      console.log('doing a logout');
       return this.$store.dispatch('identity/logout');
     }
   }
