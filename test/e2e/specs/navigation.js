@@ -3,7 +3,7 @@ module.exports = {
     const devServer = browser.globals.devServerURL;
     browser.url(devServer).waitForElementVisible('#app', 5000);
     browser.expect.element('.home').to.be.present;
-    browser.expect.element('h1').text.to.equal('Home is Wherever the Tea Is');
+    browser.expect.element('.page-title').text.to.equal('Find Great Tea');
     browser.expect
       .element('a[href="#/"]')
       .to.have.attribute('class')
@@ -63,7 +63,6 @@ module.exports = {
   'back home': function(browser) {
     browser.click('a[href="#/"]');
     browser.expect.element('.home').to.be.present;
-    browser.expect.element('h1').text.to.equal('Home is Wherever the Tea Is');
     browser.expect
       .element('a[href="#/"')
       .to.have.attribute('class')
