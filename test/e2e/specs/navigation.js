@@ -1,8 +1,10 @@
 module.exports = {
   start: function(browser) {
     const devServer = browser.globals.devServerURL;
-    browser.url(devServer).waitForElementVisible('#app', 5000);
-    browser.expect.element('.home').to.be.present;
+    browser
+      .url(devServer)
+      .waitForElementVisible('#app', 5000)
+      .expect.element('.home').to.be.present;
     browser.expect.element('.page-title').text.to.equal('Find Great Tea');
     browser.expect
       .element('a[href="#/"]')
@@ -12,8 +14,9 @@ module.exports = {
   },
 
   categories: function(browser) {
-    browser.click('a[href="#/categories"]');
-    browser.expect.element('.browse-by-category').to.be.present;
+    browser
+      .click('a[href="#/categories"]')
+      .expect.element('.browse-by-category').to.be.present;
     browser.expect.element('h1').text.to.equal('I Like to Browse by Category');
     browser.expect
       .element('a[href="#/"')
@@ -23,8 +26,7 @@ module.exports = {
   },
 
   links: function(browser) {
-    browser.click('a[href="#/links"]');
-    browser.expect.element('.links').to.be.present;
+    browser.click('a[href="#/links"]').expect.element('.links').to.be.present;
     browser.expect.element('h1').text.to.equal('Welcome to Your Vue.js App');
     browser.expect
       .element('a[href="#/"')
@@ -34,8 +36,7 @@ module.exports = {
   },
 
   login: function(browser) {
-    browser.click('a[href="#/login"]');
-    browser.expect.element('.login').to.be.present;
+    browser.click('a[href="#/login"]').expect.element('.login').to.be.present;
     browser.expect
       .element('#loginEmailGroup label')
       .text.to.equal('Email address:');
@@ -50,8 +51,8 @@ module.exports = {
   },
 
   ratings: function(browser) {
-    browser.click('a[href="#/ratings"]');
-    browser.expect.element('.browse-by-rating').to.be.present;
+    browser.click('a[href="#/ratings"]').expect.element('.browse-by-rating').to
+      .be.present;
     browser.expect.element('h1').text.to.equal('I Like to Browse by Rating');
     browser.expect
       .element('a[href="#/"')
@@ -61,8 +62,7 @@ module.exports = {
   },
 
   'back home': function(browser) {
-    browser.click('a[href="#/"]');
-    browser.expect.element('.home').to.be.present;
+    browser.click('a[href="#/"]').expect.element('.home').to.be.present;
     browser.expect
       .element('a[href="#/"')
       .to.have.attribute('class')
