@@ -74,7 +74,7 @@ module.exports = {
   logout: function(browser) {
     browser.click('.dropdown-toggle');
     browser.click('#logout-button');
-    browser.expect.element('a[href="#/login"]').to.be.present;
+    browser.waitForElementVisible('a[href="#/login"]', 2000);
   },
 
   end: function(browser) {
