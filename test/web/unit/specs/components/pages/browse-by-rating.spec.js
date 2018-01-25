@@ -4,10 +4,10 @@ import Vue from 'vue';
 import Page from '@/components/pages/browse-by-rating';
 
 describe('browse-by-rating.vue', () => {
-  it('should render correct contents', () => {
+  it('renders the correct title', () => {
     const Constructor = Vue.extend(Page);
     const vm = new Constructor().$mount();
-    expect(vm.$el.querySelector('.browse-by-rating h1').textContent)
-      .to.equal('I Like to Browse by Rating');
+    expect(vm.$el.querySelector('.browse-by-rating .page-title').textContent)
+      .to.equal('Teas by Rating');
   });
 });

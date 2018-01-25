@@ -1,6 +1,6 @@
 <template>
   <div class="browse-by-category">
-    <h1>I Like to Browse by Category</h1>
+    <div class="page-title">Types of Tea</div>
     <div>A list of categories will eventually be here</div>
     <div class="category-title" v-for="category in categories" :key="category.id">{{category.name}}</div>
   </div>

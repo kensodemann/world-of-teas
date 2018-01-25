@@ -17,9 +17,9 @@ describe('browse-by-category.vue', () => {
     testData.restore();
   });
 
-  it('should render correct title', () => {
-    expect(vm.$el.querySelector('.browse-by-category h1').textContent).to.equal(
-      'I Like to Browse by Category'
+  it('renders the correct title', () => {
+    expect(vm.$el.querySelector('.browse-by-category .page-title').textContent).to.equal(
+      'Types of Tea'
     );
   });
 
