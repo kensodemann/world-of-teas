@@ -21,11 +21,6 @@ export default {
     placeholder: String,
     showPassword: Boolean,
     value: String
-  },
-  methods: {
-    updateValue: function(value) {
-      console.log(value);
-    }
   }
 };
 </script>
