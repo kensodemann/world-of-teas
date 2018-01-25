@@ -5,14 +5,11 @@ import Page from '@/components/pages/login';
 import util from '../../../util';
 
 describe('login.vue', () => {
-  it('should render correct contents', () => {
+  it('renders the correct title', () => {
     const vm = util.mountComponent(Page);
-    expect(vm.$el.querySelector('#loginEmailGroup label').textContent).to.equal(
-      'Email address:'
+    expect(vm.$el.querySelector('.login .page-title').textContent).to.equal(
+      'Login'
     );
-    expect(
-      vm.$el.querySelector('#loginPasswordGroup label').textContent
-    ).to.equal('Password:');
   });
 
   describe('login', () => {
@@ -29,7 +26,7 @@ describe('login.vue', () => {
       vm.$store.dispatch.restore();
     });
 
-    it('should perform a login', async () => {
+    it('performs a login', async () => {
       vm.form.email = 'testlogin@test.org';
       vm.form.password = 'this.is.a.test';
       vm.login();
@@ -49,7 +46,7 @@ describe('login.vue', () => {
         vm.form.password = 'TheValidPa$$w0rd';
       });
 
-      it('should navigate to the home page', async () => {
+      it('navigates to the home page', async () => {
         vm.login();
         await Vue.nextTick();
         expect(vm.$router.replace.calledOnce).to.be.true;
@@ -71,13 +68,13 @@ describe('login.vue', () => {
         vm.form.password = 'PleaseFailMe';
       });
 
-      it('should not navigate', async () => {
+      it('does not navigate', async () => {
         vm.login();
         await Vue.nextTick();
         expect(vm.$router.replace.called).to.be.false;
       });
 
-      it('should display a login failure message', async () => {
+      it('displays a login failure message', async () => {
         vm.login();
         await Vue.nextTick();
         expect(vm.errorMessage).to.equal('Invalid email or password.');

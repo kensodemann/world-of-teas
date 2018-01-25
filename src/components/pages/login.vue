@@ -1,5 +1,6 @@
 <template>
   <div @submit.prevent="login" class="login">
+    <div class="page-title">Login</div>
     <b-form>
       <b-form-group id="loginEmailGroup"
                     label="Email address:"

@@ -1,6 +1,6 @@
 <template>
   <div class="links">
-    <h1>{{ msg }}</h1>
+    <div class="page-title">Tea Related Information</div>
     <h2>Essential Links</h2>
     <ul>
       <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
@@ -25,7 +25,6 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
     };
   }
 };

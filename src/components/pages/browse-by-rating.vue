@@ -1,6 +1,6 @@
 <template>
   <div class="browse-by-rating">
-    <h1>I Like to Browse by Rating</h1>
+    <div class="page-title">Teas by Rating</div>
     <div>A list of ratings will eventually be here</div>
   </div>
 </template>
