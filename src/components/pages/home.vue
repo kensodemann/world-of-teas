@@ -10,11 +10,17 @@
                       placeholder="Search for Tea">
         </b-form-input>
       </b-form-group>
-      <b-button variant="primary">+</b-button>
+      <b-button variant="primary" v-b-modal.teaEditor>+</b-button>
     </b-form>
 
     <div class="list tea-list">
     </div>
+
+    <b-modal id="teaEditor"
+             size="lg"
+             title="Tea">
+      <tea-editor></tea-editor>
+    </b-modal>
   </div>
 </template>
 
@@ -31,7 +37,12 @@
 
 
 <script>
+import TeaEditor from '@/components/tea-editor';
+
 export default {
+  components: {
+    TeaEditor
+  },
   data() {
     return {
       search: ''
