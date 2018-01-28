@@ -28,4 +28,27 @@ describe('rating.vue', () => {
     expect(solid.length).to.equal(3);
     expect(outline.length).to.equal(2);
   });
+
+  describe('on value updated', () => {
+    it('emits an input event', () => {
+      const Constructor = Vue.extend(Component);
+      const vm = new Constructor().$mount();
+      sinon.spy(vm, '$emit');
+      vm.updateValue(2);
+      expect(vm.$emit.calledOnce).to.be.true;
+      expect(vm.$emit.calledWith('input', 2)).to.be.true;
+    });
+
+    it('shades the proper number of stars', async () => {
+      const Constructor = Vue.extend(Component);
+      const vm = new Constructor().$mount();
+      sinon.spy(vm, '$emit');
+      vm.updateValue(2);
+      await Vue.nextTick();
+      const solid = vm.$el.querySelectorAll('.fa-star');
+      const outline = vm.$el.querySelectorAll('.fa-star-o');
+      expect(solid.length).to.equal(2);
+      expect(outline.length).to.equal(3);
+    });
+  });
 });
