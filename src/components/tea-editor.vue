@@ -54,29 +54,37 @@
       <b-form-group id="teaEditorRatingGroup"
                     label="Rating"
                     label-for="teaEditorRating">
-        <b-form-radio-group id="teaEditorRating">
-          <b-form-radio value="1">1</b-form-radio>
-          <b-form-radio value="2">2</b-form-radio>
-          <b-form-radio value="3">3</b-form-radio>
-          <b-form-radio value="4">4</b-form-radio>
-          <b-form-radio value="5">5</b-form-radio>
-        </b-form-radio-group>
+        <rating id="teaEditorRating"></rating>
       </b-form-group>
 
-      <b-form-group id="teaEditorPurchaseLinkGroup"
-                    label="Where to Purchase"
-                    label-for="teaEditorPurchaseLinkInput">
-        <b-form-input id="teaEditorPurchaseLinkInput"
-                      name="teaEditorPurchaseLinkInput"
-                      data-vv-as="purchase link"
-                      type="url"
-                      v-model="form.link"
-                      v-validate="'url'"
-                      placeholder="Enter a Valid Link">
-        </b-form-input>
-        <!-- <b-form-input id="teaEditorPurchasePriceInput"></b-form-input> -->
-        <small class="text-danger" v-show="errors.has('teaEditorPurchaseLinkInput')">{{ errors.first('teaEditorPurchaseLinkInput') }}</small>
-      </b-form-group>
+      <div class="d-flex">
+        <b-form-group id="teaEditorPurchaseLinkGroup"
+                      label="Where to Purchase"
+                      label-for="teaEditorPurchaseLinkInput">
+          <b-form-input id="teaEditorPurchaseLinkInput"
+                        name="teaEditorPurchaseLinkInput"
+                        data-vv-as="purchase link"
+                        type="url"
+                        v-model="form.link"
+                        v-validate="'url'"
+                        placeholder="Enter a Valid Link">
+          </b-form-input>
+          <small class="text-danger" v-show="errors.has('teaEditorPurchaseLinkInput')">{{ errors.first('teaEditorPurchaseLinkInput') }}</small>
+        </b-form-group>
+
+        <b-form-group id="teaEditorPurchasePriceGroup"
+                      label="Price"
+                      label-for="teaEditorPurchasePriceInput">
+          <b-form-input id="teaEditorPurchasePriceInput"
+                        name="teaEditorPurchasePriceInput"
+                        data-vv-as="purchase price"
+                        type="number"
+                        v-model="form.link"
+                        placeholder="Per 100g">
+          </b-form-input>
+          <small class="text-danger" v-show="errors.has('teaEditorPurchasePriceInput')">{{ errors.first('teaEditorPurchasePriceInput') }}</small>
+        </b-form-group>
+      </div>
     </b-form>
   </div>
 </template>
@@ -85,15 +93,29 @@
 form {
   margin: 10px;
 }
+
+#teaEditorPurchaseLinkGroup {
+  flex-grow: 1;
+  margin-right: 10px;
+}
 </style>
 
 
 <script>
+import Rating from './rating';
+
 export default {
+  components: {
+    Rating
+  },
   computed: {
     categoryOptions: function() {
-      // TODO: need to prepend with a blank option
-      return this.categories.map(cat => ({ value: cat, text: cat.name }));
+      const cats = [{ value: null, text: 'Please select a category' }];
+      Array.prototype.push.apply(
+        cats,
+        this.categories.map(cat => ({ value: cat, text: cat.name }))
+      );
+      return cats;
     }
   },
   data() {
@@ -102,7 +124,7 @@ export default {
         name: '',
         description: '',
         instructions: '',
-        category: {}
+        category: null
       },
       categories: [
         // Eventually obtained from the vuex store, pre-loaded at startup`.
