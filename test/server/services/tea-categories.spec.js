@@ -3,7 +3,7 @@
 const expect = require('chai').expect;
 const MockPool = require('../mocks/mock-pool');
 const sinon = require('sinon');
-const Servce = require('../../../server/services/tea-categories');
+const Service = require('../../../server/services/tea-categories');
 
 describe('service: tea-categories', () => {
   let pool;
@@ -29,7 +29,7 @@ describe('service: tea-categories', () => {
         description: 'Not a tea'
       }
     ];
-    service = new Servce(pool);
+    service = new Service(pool);
   });
 
   describe('getAll', () => {

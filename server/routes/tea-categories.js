@@ -1,14 +1,12 @@
 'use strict';
 
+const Repository = require('./repository');
 const TeaCategoriesService = require('../services/tea-categories');
 
 module.exports = (app, pool) => {
-  const teaCategories = new TeaCategoriesService(pool);
+  const repository = new Repository(new TeaCategoriesService(pool));
 
   app.get('/api/tea-categories', (req, res) => {
-    (async () => {
-      const data = await teaCategories.getAll();
-      res.send(data);
-    })().catch(e => console.log(e.stack));
+    repository.getAll(req, res);
   });
 };
