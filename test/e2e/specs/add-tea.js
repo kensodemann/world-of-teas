@@ -7,11 +7,11 @@ module.exports = {
 
   openCloseWithoutChange: function(browser) {
     browser
-      .click('.form-inline button')
+      .click('form button')
       .waitForElementVisible('#teaEditor', 2000)
       .click('#teaEditor .close')
       .waitForElementNotVisible('#teaEditor', 2000)
-      .click('.form-inline button')
+      .click('form button')
       .waitForElementVisible('#teaEditor', 2000)
       .click('#teaEditor .btn-secondary')
       .waitForElementNotVisible('#teaEditor', 2000);
