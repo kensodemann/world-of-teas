@@ -1,21 +1,20 @@
 'use strict';
 
 const PasswordService = require('../services/password');
+const Repository = require('./repository');
 const UsersService = require('../services/users');
 
 module.exports = (app, auth, pool) => {
   const password = new PasswordService(pool);
   const users = new UsersService(pool);
+  const userRepo = new Repository(users);
 
   app.get(
     '/api/users',
     auth.requireApiLogin.bind(auth),
     auth.requireRole('admin').bind(auth),
     (req, res) => {
-      (async () => {
-        const data = await users.getAll();
-        res.send(data);
-      })().catch(e => console.error(e.stack));
+      userRepo.getAll(req, res);
     }
   );
 
@@ -36,14 +35,7 @@ module.exports = (app, auth, pool) => {
     auth.requireApiLogin.bind(auth),
     auth.requireRoleOrId('admin').bind(auth),
     (req, res) => {
-      (async () => {
-        const data = await users.get(req.params.id);
-        if (!data) {
-          res.status(404);
-          res.end();
-        }
-        res.send(data);
-      })().catch(e => console.error(e.stack));
+      userRepo.get(req, res);
     }
   );
 
@@ -52,12 +44,7 @@ module.exports = (app, auth, pool) => {
     auth.requireApiLogin.bind(auth),
     auth.requireRole('admin').bind(auth),
     (req, res) => {
-      (async () => {
-        let user = Object.assign({}, req.body);
-        delete user.id;
-        const data = await users.save(user);
-        res.send(data);
-      })().catch(e => console.error(e.stack));
+      userRepo.insert(req, res);
     }
   );
 
@@ -66,17 +53,7 @@ module.exports = (app, auth, pool) => {
     auth.requireApiLogin.bind(auth),
     auth.requireRoleOrId('admin').bind(auth),
     (req, res) => {
-      (async () => {
-        const user = Object.assign({}, req.body, {
-          id: parseInt(req.params.id)
-        });
-        const data = await users.save(user);
-        if (!data) {
-          res.status(404);
-          res.end();
-        }
-        res.send(data);
-      })().catch(e => console.error(e.stack));
+      userRepo.update(req, res);
     }
   );
 
