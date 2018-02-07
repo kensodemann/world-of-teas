@@ -3,18 +3,45 @@
 import Vue from 'vue';
 
 import Page from '@/components/pages/browse-by-category';
-import testData from '../../../test-data';
+import mockHttp from '../../../mock-http';
 
 describe('browse-by-category.vue', () => {
+  let teaCategories;
   let vm;
   beforeEach(() => {
-    testData.initialize();
+    mockHttp.initialize();
+    teaCategories = [
+      {
+        id: 1,
+        name: 'Green',
+        description: 'Non - oxidized, mild tea'
+      },
+      {
+        id: 2,
+        name: 'Black',
+        description: 'Oxidized tea'
+      },
+      {
+        id: 3,
+        name: 'Herbal',
+        description: 'Not a tea'
+      },
+      {
+        id: 4,
+        name: 'Oolong',
+        description: 'Chinese deliciousness'
+      }
+    ];
+    mockHttp.setResponse('/api/tea-categories', {
+      status: 200,
+      body: teaCategories
+    });
     const Constructor = Vue.extend(Page);
     vm = new Constructor().$mount();
   });
 
   afterEach(() => {
-    testData.restore();
+    mockHttp.restore();
   });
 
   it('renders the correct title', () => {
@@ -25,7 +52,7 @@ describe('browse-by-category.vue', () => {
 
   it('should fetch the tea categories', () => {
     return Vue.nextTick().then(() => {
-      expect(vm.categories).to.deep.equal(testData.teaCategories);
+      expect(vm.categories).to.deep.equal(teaCategories);
     });
   });
 

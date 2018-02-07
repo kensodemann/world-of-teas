@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 import authentication from '@/api/authentication';
-import testData from '../../test-data';
+import mockHttp from '../../mock-http';
 
 const loginResponse = {
   success: true,
@@ -23,15 +23,15 @@ describe('authentication', () => {
 
   describe('login', () => {
     beforeEach(() => {
-      testData.initialize();
-      testData.setPostResponse('/api/login', {
+      mockHttp.initialize();
+      mockHttp.setPostResponse('/api/login', {
         status: 200,
         body: loginResponse
       });
     });
 
     afterEach(() => {
-      testData.restore();
+      mockHttp.restore();
     });
 
     it('posts to the login endpoint', async () => {
@@ -57,14 +57,14 @@ describe('authentication', () => {
 
   describe('logout', () => {
     beforeEach(() => {
-      testData.initialize();
-      testData.setPostResponse('/api/logout', {
+      mockHttp.initialize();
+      mockHttp.setPostResponse('/api/logout', {
         status: 200
       });
     });
 
     afterEach(() => {
-      testData.restore();
+      mockHttp.restore();
     });
 
     it('posts to the logout endpoint', async () => {

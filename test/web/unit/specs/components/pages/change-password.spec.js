@@ -4,16 +4,16 @@ import Vue from 'vue';
 import Page from '@/components/pages/change-password';
 import store from '@/store';
 
-import testData from '../../../test-data';
+import mockHttp from '../../../mock-http';
 import util from '../../../util';
 
 describe('change-password.vue', () => {
   beforeEach(() => {
-    testData.initialize();
+    mockHttp.initialize();
   });
 
   afterEach(() => {
-    testData.restore();
+    mockHttp.restore();
   });
 
   it('should render correct contents', () => {
@@ -35,7 +35,7 @@ describe('change-password.vue', () => {
   describe('change password', () => {
     let vm;
     beforeEach(() => {
-      testData.setPostResponse('/api/users/73/password', { status: 200 });
+      mockHttp.setPostResponse('/api/users/73/password', { status: 200 });
       store.commit('identity/login', {
         token: 'asdfiig93',
         user: {
@@ -67,7 +67,7 @@ describe('change-password.vue', () => {
 
     describe('on success', () => {
       it('should navigate to the profile page', async () => {
-        testData.setPostResponse('/api/users/73/password', {
+        mockHttp.setPostResponse('/api/users/73/password', {
           status: 200,
           body: { success: true }
         });
@@ -79,7 +79,7 @@ describe('change-password.vue', () => {
 
     describe('on failure', () => {
       beforeEach(() => {
-        testData.setPostResponse('/api/users/73/password', {
+        mockHttp.setPostResponse('/api/users/73/password', {
           status: 400,
           body: { reason: 'Error: Invalid Password' }
         });
