@@ -33,6 +33,13 @@ export default {
       statusText: 'OK'
     };
   },
+  ['POST /api/logout'](pathMatch, query, request) {
+    logger.log(pathMatch, query, request);
+    return {
+      status: 200,
+      statusText: 'OK'
+    }
+  },
   ['POST /api/users/:id'](pathMatch, query, request) {
     logger.log(pathMatch, query, request);
     return {
@@ -45,13 +52,13 @@ export default {
     logger.log(pathMatch, query, request);
     if (request.body && request.body.currentPassword === 'TheValidPa$$w0rd') {
       return {
-        body: { success: true },
+        body: {success: true},
         status: 200,
         statusText: 'OK'
       };
     } else {
       return {
-        body: { reason: 'Error: Invalid Password.' },
+        body: {reason: 'Error: Invalid Password.'},
         status: 400
       };
     }
