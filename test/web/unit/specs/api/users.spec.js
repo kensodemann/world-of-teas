@@ -2,15 +2,15 @@
 
 import Vue from 'vue';
 import users from '@/api/users';
-import testData from '../../test-data';
+import mockHttp from '../../mock-http';
 
 describe('users', () => {
   beforeEach(() => {
-    testData.initialize();
+    mockHttp.initialize();
   });
 
   afterEach(() => {
-    testData.restore();
+    mockHttp.restore();
   });
 
   it('exists', () => {
@@ -27,7 +27,7 @@ describe('users', () => {
     };
 
     beforeEach(() => {
-      testData.setResponse('/api/users/current', {
+      mockHttp.setResponse('/api/users/current', {
         status: 200,
         body: currentUser
       });
@@ -47,7 +47,7 @@ describe('users', () => {
 
   describe('change password', () => {
     it('posts to the change password', async () => {
-      testData.setPostResponse('/api/users/42/password', {
+      mockHttp.setPostResponse('/api/users/42/password', {
         status: 200,
         body: { status: 200 }
       });
@@ -64,7 +64,7 @@ describe('users', () => {
 
   describe('save', () => {
     it('posts new users', async () => {
-      testData.setPostResponse('/api/users', {
+      mockHttp.setPostResponse('/api/users', {
         status: 200,
         body: {
           id: 73,
@@ -88,7 +88,7 @@ describe('users', () => {
     });
 
     it('posts changes to existing users', async () => {
-      testData.setPostResponse('/api/users/73', {
+      mockHttp.setPostResponse('/api/users/73', {
         status: 200,
         body: {
           id: 73,
