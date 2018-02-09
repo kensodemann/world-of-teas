@@ -38,7 +38,7 @@ export default {
     return {
       status: 200,
       statusText: 'OK'
-    }
+    };
   },
   ['POST /api/users/:id'](pathMatch, query, request) {
     logger.log(pathMatch, query, request);
