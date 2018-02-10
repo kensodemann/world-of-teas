@@ -4,6 +4,8 @@ import logger from './data-service-logger';
 
 import login from './login';
 import teaCategories from './tea-categories';
+import teaPurchaseLinks from './tea-purchase-links';
+import teas from './teas';
 import users from './users';
 
 // see here for more options: https://github.com/noru/vue-resource-mock
@@ -11,9 +13,24 @@ import users from './users';
 export default {
   ['GET /api/tea-categories'](pathMatch, query, request) {
     logger.log(pathMatch, query, request);
-    const body = teaCategories;
     return {
-      body: body,
+      body: teaCategories,
+      status: 200,
+      statusText: 'OK'
+    };
+  },
+  ['GET /api/teas'](pathMatch, query, request) {
+    logger.log(pathMatch, query, request);
+    return {
+      body: teas,
+      status: 200,
+      statusText: 'OK'
+    };
+  },
+  ['GET /api/teas/:id/links'](pathMatch, query, request) {
+    logger.log(pathMatch, query, request);
+    return {
+      body: teaPurchaseLinks.filter(t => t.teaId.toString() === pathMatch.id),
       status: 200,
       statusText: 'OK'
     };

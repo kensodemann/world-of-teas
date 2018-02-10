@@ -27,20 +27,20 @@ describe('route: /api/teas', () => {
       return Promise.resolve(value);
     }
 
-    save(user) {
+    save(tea) {
       saveCalled++;
-      saveCalledWith = user;
+      saveCalledWith = tea;
 
-      if (user.id && !testData.find(item => item.id === user.id)) {
+      if (tea.id && !testData.find(item => item.id === tea.id)) {
         return Promise.resolve();
       }
-      const value = Object.assign({}, { id: 314159 }, user);
+      const value = Object.assign({}, { id: 314159 }, tea);
       return Promise.resolve(value);
     }
 
-    delete(user) {
+    delete(id) {
       deleteCalled++;
-      deleteCalledWith = user;
+      deleteCalledWith = id;
       return Promise.resolve({});
     }
   }
@@ -237,15 +237,7 @@ describe('route: /api/teas', () => {
       mockJWT.verify.throws(new Error('no loggy loggy'));
       request(app)
         .delete('/api/teas/30')
-        .send({
-          id: 30,
-          name: 'Grassy Green',
-          teaCategoryId: 1,
-          teaCategoryName: 'Green',
-          description: 'something about the tea',
-          instructions: 'do something with the tea',
-          rating: 2
-        })
+        .send({ })
         .end((err, res) => {
           expect(deleteCalled).to.equal(0);
           expect(res.status).to.equal(401);
