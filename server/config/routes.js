@@ -11,6 +11,7 @@ module.exports = (app, pool) => {
 
   require('../routes/athentication')(app, auth);
   require('../routes/tea-categories')(app, pool);
+  require('../routes/tea-purchase-links')(app, auth, pool);
   require('../routes/teas')(app, auth, pool);
   require('../routes/users')(app, auth, pool);
 };
