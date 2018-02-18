@@ -1,23 +1,22 @@
-'use strict';
-
 import Vue from 'vue';
 
 export default {
-  current() {
-    return Vue.http.get('/api/users/current').then(res => res.body);
+  async current() {
+    const res = await Vue.http.get('/api/users/current');
+    return res.body;
   },
 
-  changePassword(id, currentPassword, newPassword) {
-    return Vue.http
-      .post(`/api/users/${id}/password`, {
-        currentPassword: currentPassword,
-        password: newPassword
-      })
-      .then(res => res.body);
+  async changePassword(id, currentPassword, newPassword) {
+    const res = await Vue.http.post(`/api/users/${id}/password`, {
+      currentPassword: currentPassword,
+      password: newPassword
+    });
+    return res.body;
   },
 
-  save(user) {
+  async save(user) {
     const url = '/api/users' + (user.id ? `/${user.id}` : '');
-    return Vue.http.post(url, user).then(res => res.body);
+    const res = await Vue.http.post(url, user);
+    return res.body;
   }
 };

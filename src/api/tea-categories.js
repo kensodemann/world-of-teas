@@ -1,9 +1,8 @@
-'use strict';
-
 import Vue from 'vue';
 
 export default {
-  getAll() {
-    return Vue.http.get('/api/tea-categories').then(res => res.body);
+  async getAll() {
+    const res = await Vue.http.get('/api/tea-categories');
+    return res.body;
   }
 };

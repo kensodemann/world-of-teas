@@ -1,23 +1,24 @@
-'use strict';
-
 import Vue from 'vue';
 
 export default {
-  getAll() {
-    return Vue.http.get('/api/teas').then(res => res.body);
+  async getAll() {
+    const res = await Vue.http.get('/api/teas');
+    return res.body;
   },
 
-  save(tea) {
+  async save(tea) {
     const url = '/api/teas' + (tea.id ? `/${tea.id}` : '');
-    return Vue.http.post(url, tea).then(res => res.body);
+    const res = await Vue.http.post(url, tea);
+    return res.body;
   },
 
-  delete(tea) {
+  async delete(tea) {
     if (!(tea && tea.id)) {
       return Promise.reject(new Error('attempt to delete tea without ID'));
     }
 
     const url = '/api/teas' + (tea.id ? `/${tea.id}` : '');
-    return Vue.http.delete(url).then(res => res.body);
+    const res = await Vue.http.delete(url);
+    return res.body;
   }
 };
