@@ -1,5 +1,5 @@
 export default {
-  load: (state, links) => {
+  load(state, links) {
     state.teas = hash(state.teas, links);
   },
 

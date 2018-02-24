@@ -20,6 +20,8 @@ export default {
   store: store,
   created: function() {
     store.dispatch('identity/refresh');
+    store.dispatch('teaCategories/refresh');
+    store.dispatch('teas/refresh');
   }
 };
 </script>

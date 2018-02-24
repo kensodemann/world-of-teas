@@ -5,6 +5,7 @@ import Vuex from 'vuex';
 
 import identity from './modules/identity';
 import purchaseLinks from './modules/purchase-links';
+import teaCategories from './modules/tea-categories';
 import teas from './modules/teas';
 
 Vue.use(Vuex);
@@ -14,6 +15,7 @@ export default new Vuex.Store({
   modules: {
     identity,
     purchaseLinks,
+    teaCategories,
     teas
   }
 });
