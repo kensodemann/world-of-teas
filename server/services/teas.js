@@ -1,7 +1,7 @@
 'use strict';
 
 const columns =
-  'teas.id,"' +
+  'teas.id,' +
   'teas.name,' +
   'teas.tea_category_rid as "teaCategoryId",' +
   'tea_categories.name as "teaCategoryName",' +
