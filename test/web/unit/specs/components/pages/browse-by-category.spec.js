@@ -3,13 +3,60 @@
 import Vue from 'vue';
 
 import Page from '@/components/pages/browse-by-category';
+import store from '@/store';
 import mockHttp from '../../../mock-http';
+import util from '../../../util';
 
 describe('browse-by-category.vue', () => {
   let teaCategories;
-  let vm;
   beforeEach(() => {
+    initializeTestData();
     mockHttp.initialize();
+    mockHttp.setResponse('/api/tea-categories', {
+      status: 200,
+      body: teaCategories
+    });
+  });
+
+  afterEach(() => {
+    mockHttp.restore();
+  });
+
+  it('renders the correct title', () => {
+    const vm = util.mountComponent(Page);
+    expect(
+      vm.$el.querySelector('.browse-by-category .page-title').textContent
+    ).to.equal('Types of Tea');
+  });
+
+  it('renders a title for each category', () => {
+    store.commit('teaCategories/load', teaCategories);
+    const vm = util.mountComponent(Page);
+    const titles = vm.$el.querySelectorAll(
+      '.browse-by-category .category-title'
+    );
+    expect(titles.length).to.equal(teaCategories.length);
+    for (let i = 0; i < titles.length; i++) {
+      expect(titles[i].textContent).to.equal(vm.categories[i].name);
+    }
+  });
+
+  it('renders a title for each category if loaded after the page is initially rendered', async () => {
+    store.commit('teaCategories/load', []);
+    const vm = util.mountComponent(Page);
+    let titles = vm.$el.querySelectorAll(
+      '.browse-by-category .category-title'
+    );
+    expect(titles.length).to.equal(0);
+    store.commit('teaCategories/load', teaCategories);
+    await Vue.nextTick();
+    titles = vm.$el.querySelectorAll(
+      '.browse-by-category .category-title'
+    );
+    expect(titles.length).to.equal(teaCategories.length);
+  });
+
+  function initializeTestData() {
     teaCategories = [
       {
         id: 1,
@@ -32,41 +79,5 @@ describe('browse-by-category.vue', () => {
         description: 'Chinese deliciousness'
       }
     ];
-    mockHttp.setResponse('/api/tea-categories', {
-      status: 200,
-      body: teaCategories
-    });
-    const Constructor = Vue.extend(Page);
-    vm = new Constructor().$mount();
-  });
-
-  afterEach(() => {
-    mockHttp.restore();
-  });
-
-  it('renders the correct title', () => {
-    expect(vm.$el.querySelector('.browse-by-category .page-title').textContent).to.equal(
-      'Types of Tea'
-    );
-  });
-
-  it('should fetch the tea categories', () => {
-    return Vue.nextTick().then(() => {
-      expect(vm.categories).to.deep.equal(teaCategories);
-    });
-  });
-
-  it('should render a title for each category', () => {
-    return Vue.nextTick().then(() => {
-      return Vue.nextTick().then(() => {
-        const titles = vm.$el.querySelectorAll(
-          '.browse-by-category .category-title'
-        );
-        expect(titles.length).to.equal(vm.categories.length);
-        for (let i = 0; i < titles.length; i++) {
-          expect(titles[i].textContent).to.equal(vm.categories[i].name);
-        }
-      });
-    });
-  });
+  }
 });
