@@ -1,10 +1,10 @@
 export default {
-  load: (state, data) => {
+  load(state, data) {
     state.list = data;
     state.hash = hash(data);
   },
 
-  remove: (state, data) => {
+  remove(state, data) {
     const { id } = data;
     if (id) {
       const idx = state.list.findIndex(element => element.id === id);
@@ -15,7 +15,7 @@ export default {
     }
   },
 
-  save: (state, data) => {
+  save(state, data) {
     const { id } = data;
     if (id) {
       const idx = state.list.findIndex(element => element.id === id);
