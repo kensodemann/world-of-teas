@@ -7,18 +7,11 @@
 </template>
 
 <script>
-import teaCategories from '@/api/tea-categories';
-
 export default {
-  data: function() {
-    return {
-      categories: []
-    };
-  },
-  created: function() {
-    teaCategories.getAll().then(res => {
-      this.categories = res;
-    });
+  computed: {
+    categories() {
+      return this.$store.state.teaCategories.list;
+    }
   }
 };
 </script>
