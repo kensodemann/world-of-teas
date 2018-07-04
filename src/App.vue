@@ -52,11 +52,12 @@ body {
 #main-header {
   flex: 0 0 auto;
 }
+
 #main-content {
   flex: 1 1 auto;
   overflow-y: auto;
-  margin-left: $standard-spacing;
-  margin-right: $standard-spacing;
+  padding-left: $standard-spacing;
+  padding-right: $standard-spacing;
 }
 
 #main-footer {

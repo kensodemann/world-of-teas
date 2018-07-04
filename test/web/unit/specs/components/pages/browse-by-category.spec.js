@@ -22,38 +22,36 @@ describe('browse-by-category.vue', () => {
     mockHttp.restore();
   });
 
-  it('renders the correct title', () => {
-    const vm = util.mountComponent(Page);
-    expect(
-      vm.$el.querySelector('.browse-by-category .page-title').textContent
-    ).to.equal('Types of Tea');
-  });
-
-  it('renders a title for each category', () => {
+  it('renders a card for each category', () => {
     store.commit('teaCategories/load', teaCategories);
     const vm = util.mountComponent(Page);
-    const titles = vm.$el.querySelectorAll(
-      '.browse-by-category .category-title'
+    const cards = vm.$el.querySelectorAll(
+      '.page .card'
     );
-    expect(titles.length).to.equal(teaCategories.length);
-    for (let i = 0; i < titles.length; i++) {
-      expect(titles[i].textContent).to.equal(vm.categories[i].name);
+    expect(cards.length).to.equal(teaCategories.length);
+    for (let i = 0; i < cards.length; i++) {
+      const title = cards[i].querySelector('.card-title');
+      expect(title.textContent).to.equal(vm.categories[i].name);
     }
   });
 
-  it('renders a title for each category if loaded after the page is initially rendered', async () => {
+  it('renders a card for each category if loaded after the page is initially rendered', async () => {
     store.commit('teaCategories/load', []);
     const vm = util.mountComponent(Page);
-    let titles = vm.$el.querySelectorAll(
-      '.browse-by-category .category-title'
+    let cards = vm.$el.querySelectorAll(
+      '.page .card'
     );
-    expect(titles.length).to.equal(0);
+    expect(cards.length).to.equal(0);
     store.commit('teaCategories/load', teaCategories);
     await Vue.nextTick();
-    titles = vm.$el.querySelectorAll(
-      '.browse-by-category .category-title'
+    cards = vm.$el.querySelectorAll(
+      '.page .card'
     );
-    expect(titles.length).to.equal(teaCategories.length);
+    expect(cards.length).to.equal(teaCategories.length);
+    for (let i = 0; i < cards.length; i++) {
+      const title = cards[i].querySelector('.card-title');
+      expect(title.textContent).to.equal(vm.categories[i].name);
+    }
   });
 
   function initializeTestData() {
