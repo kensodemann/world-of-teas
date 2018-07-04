@@ -6,7 +6,7 @@ To create the database on a local machine:
 1. create a role named `ken`
 1. create a database named `worldofteas`
 1. cd into this directory
-1. `psql postgres://ken:ken@localhost/worldoftea` (to update the production database `heroku pg:psql`)
+1. `psql postgres://ken:ken@localhost/worldofteas` (to update the production database `heroku pg:psql`) (also, see notes if this fails)
 1. `worldofteas=> \i install.sql`
 
 That should create all tables without error and populate the default data.
@@ -29,3 +29,29 @@ That should create all tables without error and populate the default data.
 ## First Time Use
 
 When creating a new database you will need to also create an initial user. Doing that is _not_ part of these scripts. See the `special` scripts and the documentation there for more details on how to do that.
+
+## Notes
+
+### Sample of Creating Role
+
+```bash
+~/Projects/Home: sudo su - postgres
+postgres@pop-os:~$ psql
+psql (10.4 (Ubuntu 10.4-2.pgdg18.04+1))
+Type "help" for help.
+
+postgres=# create role ken;
+CREATE ROLE
+postgres=# create database worldoftea;
+CREATE DATABASE
+```
+
+If you get an error message about needing a password in order to get into the database, you may need to edit the `/etc/postgresql/10/main/pg_hba.conf` file as such:
+
+```
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+host    all             all             localhost               trust
+```
+
+Specifically the second line.
