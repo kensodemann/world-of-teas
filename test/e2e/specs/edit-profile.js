@@ -61,10 +61,13 @@ module.exports = {
       .element('#profileEmailAddressInput')
       .value.to.equal('test@testy.com');
     browser
+      .click('#profileFirstNameInput')
+      .setValue('#profileFirstNameInput', 't')
       .clearValue('#profileFirstNameInput')
       .expect.element('#profileFirstNameGroup .text-danger')
       .text.to.equal('The first name field is required.');
     browser
+      .click('#profileEmailAddressInput')
       .clearValue('#profileEmailAddressInput')
       .expect.element('#profileEmailAddressGroup .text-danger')
       .text.to.equal('The email address field is required.');

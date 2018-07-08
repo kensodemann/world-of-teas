@@ -16,10 +16,9 @@ module.exports = {
   categories: function(browser) {
     browser
       .click('a[href="#/categories"]')
-      .expect.element('.browse-by-category').to.be.present;
-    browser.expect.element('.page-title').text.to.equal('Types of Tea');
+      .expect.element('.page').to.be.present;
     browser.expect
-      .element('a[href="#/"')
+      .element('a[href="#/"]')
       .to.have.attribute('class')
       .which.not.contains('active');
     browser.expect.element('.active > .nav-link').text.to.equal('Categories');
@@ -29,7 +28,7 @@ module.exports = {
     browser.click('a[href="#/links"]').expect.element('.links').to.be.present;
     browser.expect.element('.page-title').text.to.equal('Tea Related Information');
     browser.expect
-      .element('a[href="#/"')
+      .element('a[href="#/"]')
       .to.have.attribute('class')
       .which.not.contains('active');
     browser.expect.element('.active > .nav-link').text.to.equal('Links');
@@ -46,7 +45,7 @@ module.exports = {
       .be.present;
     browser.expect.element('.page-title').text.to.equal('Teas by Rating');
     browser.expect
-      .element('a[href="#/"')
+      .element('a[href="#/"]')
       .to.have.attribute('class')
       .which.not.contains('active');
     browser.expect.element('.active > .nav-link').text.to.equal('Ratings');
@@ -55,7 +54,7 @@ module.exports = {
   'back home': function(browser) {
     browser.click('a[href="#/"]').expect.element('.home').to.be.present;
     browser.expect
-      .element('a[href="#/"')
+      .element('a[href="#/"]')
       .to.have.attribute('class')
       .which.contains('active');
     browser.expect.element('.active > .nav-link').to.not.be.present;

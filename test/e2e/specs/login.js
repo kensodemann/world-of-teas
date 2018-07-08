@@ -10,7 +10,7 @@ module.exports = {
     browser.expect.element('#loginEmailGroup .text-danger').to.not.be.visible;
     browser.expect.element('#loginPasswordGroup .text-danger').to.not.be
       .visible;
-    browser.expect.element('button[type="submit"').to.not.be.enabled;
+    browser.expect.element('button[type="submit"]').to.not.be.enabled;
   },
 
   'show password': function(browser) {
@@ -31,6 +31,8 @@ module.exports = {
   validations: function(browser) {
     browser
       .click('#loginEmailInput')
+      .setValue('#loginEmailInput', 'test')
+      .clearValue('#loginEmailInput')
       .click('#loginPasswordInput')
       .expect.element('#loginEmailGroup .text-danger').to.be.visible;
     browser.expect
