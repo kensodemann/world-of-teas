@@ -1,3 +1,35 @@
+<a name="0.0.1-4"></a>
+## [0.0.1-4](https://github.com/kensodemann/world-of-teas/compare/v0.0.1-3...v0.0.1-4) (2018-07-08)
+
+
+### Bug Fixes
+
+* **e2e:** correct the button selector ([#91](https://github.com/kensodemann/world-of-teas/issues/91)) ([f81750f](https://github.com/kensodemann/world-of-teas/commit/f81750f))
+* **teas:** fix the SQL for the teas endpoint ([#102](https://github.com/kensodemann/world-of-teas/issues/102)) ([c877ce6](https://github.com/kensodemann/world-of-teas/commit/c877ce6))
+* **test:** clean up the e2e tests ([79792fa](https://github.com/kensodemann/world-of-teas/commit/79792fa))
+* **test:** clean up the unit tests ([14aab12](https://github.com/kensodemann/world-of-teas/commit/14aab12))
+
+
+### Features
+
+* **categories:** fill out the tea categories ([#105](https://github.com/kensodemann/world-of-teas/issues/105)) ([d1f9926](https://github.com/kensodemann/world-of-teas/commit/d1f9926))
+* **security:** experiment just port 8100 ([6d74c0a](https://github.com/kensodemann/world-of-teas/commit/6d74c0a))
+* **security:** experiment with restrictive ACAO ([8d1212d](https://github.com/kensodemann/world-of-teas/commit/8d1212d))
+* **security:** experiment with slightly less restrictive ACAO ([3f79123](https://github.com/kensodemann/world-of-teas/commit/3f79123))
+* **security:** set allow origin via env ([7287fcd](https://github.com/kensodemann/world-of-teas/commit/7287fcd))
+* **tea:** add purchase links to the data store ([#100](https://github.com/kensodemann/world-of-teas/issues/100)) ([342d1d8](https://github.com/kensodemann/world-of-teas/commit/342d1d8)), closes [#98](https://github.com/kensodemann/world-of-teas/issues/98)
+* **tea:** add tea related tables ([#86](https://github.com/kensodemann/world-of-teas/issues/86)) ([d02bf27](https://github.com/kensodemann/world-of-teas/commit/d02bf27))
+* **tea:** add teas to the store ([#97](https://github.com/kensodemann/world-of-teas/issues/97)) ([d059569](https://github.com/kensodemann/world-of-teas/commit/d059569)), closes [#90](https://github.com/kensodemann/world-of-teas/issues/90)
+* **tea:** add the tea purchase links endpoints ([#96](https://github.com/kensodemann/world-of-teas/issues/96)) ([dd37045](https://github.com/kensodemann/world-of-teas/commit/dd37045)), closes [#85](https://github.com/kensodemann/world-of-teas/issues/85)
+* **tea:** add the teas endpoint ([#92](https://github.com/kensodemann/world-of-teas/issues/92)) ([46769a6](https://github.com/kensodemann/world-of-teas/commit/46769a6)), closes [#36](https://github.com/kensodemann/world-of-teas/issues/36)
+* **tea:** create the tea API service ([#95](https://github.com/kensodemann/world-of-teas/issues/95)) ([4797023](https://github.com/kensodemann/world-of-teas/commit/4797023)), closes [#89](https://github.com/kensodemann/world-of-teas/issues/89)
+* **tea:** create the tea purchase links API service ([#99](https://github.com/kensodemann/world-of-teas/issues/99)) ([2c784fd](https://github.com/kensodemann/world-of-teas/commit/2c784fd)), closes [#93](https://github.com/kensodemann/world-of-teas/issues/93)
+* **tea:** make the table names plural ([#88](https://github.com/kensodemann/world-of-teas/issues/88)) ([f8a91b5](https://github.com/kensodemann/world-of-teas/commit/f8a91b5))
+* **tea:** mock up the tea editor ([#79](https://github.com/kensodemann/world-of-teas/issues/79)) ([a526f09](https://github.com/kensodemann/world-of-teas/commit/a526f09))
+* **tea-categories:** add tea-categories to the store ([#103](https://github.com/kensodemann/world-of-teas/issues/103)) ([58cca33](https://github.com/kensodemann/world-of-teas/commit/58cca33))
+
+
+
 <a name="0.0.1-3"></a>
 ## [0.0.1-3](https://github.com/kensodemann/world-of-teas/compare/v0.0.1-2...v0.0.1-3) (2018-01-23)
 
