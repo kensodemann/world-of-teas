@@ -125,6 +125,10 @@ function runTasks(oldVersion, inc) {
       task: () => execa('npm', ['run', 'changelog'], { cwd: rootDir })
     },
     {
+      title: 'Updating package-lock.json via install',
+      task: () => execa('npm', ['install'], { cwd: rootDir })
+    },
+    {
       title: 'Committing',
       task: () => execa('git', ['commit', `-am chore(release): release ${newVersion}`], { cwd: rootDir })
     },
