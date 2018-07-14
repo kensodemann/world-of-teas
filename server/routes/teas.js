@@ -19,6 +19,10 @@ module.exports = (app, auth, pool) => {
     repository.update(req, res);
   });
 
+  app.post('/api/teas', auth.requireApiLogin.bind(auth), (req, res) => {
+    repository.insert(req, res);
+  });
+
   app.delete('/api/teas/:id', auth.requireApiLogin.bind(auth), (req, res) => {
     repository.delete(req, res);
   });

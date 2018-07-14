@@ -176,6 +176,54 @@ describe('route: /api/teas', () => {
       saveCalledWith = null;
     });
 
+    describe('without an id', () => {
+      it('requires an API login', done => {
+        mockJWT.verify.throws(new Error('no loggy loggy'));
+        request(app)
+          .post('/api/teas')
+          .send({
+            name: 'Grassy Green',
+            teaCategoryId: 1,
+            teaCategoryName: 'Green',
+            description: 'something about the tea',
+            instructions: 'do something with the tea',
+            rating: 2
+          })
+          .end((err, res) => {
+            expect(saveCalled).to.equal(0);
+            expect(res.status).to.equal(401);
+            expect(res.body).to.deep.equal({});
+            done();
+          });
+      });
+
+      it('saves the new tea', done => {
+        request(app)
+          .post('/api/teas')
+          .send({
+            id: 420,
+            name: 'Grassy Green',
+            teaCategoryId: 1,
+            teaCategoryName: 'Green',
+            description: 'something about the tea',
+            instructions: 'do something with the tea',
+            rating: 2
+          })
+          .end((err, res) => {
+            expect(saveCalled).to.equal(1);
+            expect(saveCalledWith).to.deep.equal({
+              name: 'Grassy Green',
+              teaCategoryId: 1,
+              teaCategoryName: 'Green',
+              description: 'something about the tea',
+              instructions: 'do something with the tea',
+              rating: 2
+            });
+            done();
+          });
+      });
+    });
+
     describe('with an id', () => {
       it('requires an API login', done => {
         mockJWT.verify.throws(new Error('no loggy loggy'));
@@ -237,7 +285,7 @@ describe('route: /api/teas', () => {
       mockJWT.verify.throws(new Error('no loggy loggy'));
       request(app)
         .delete('/api/teas/30')
-        .send({ })
+        .send({})
         .end((err, res) => {
           expect(deleteCalled).to.equal(0);
           expect(res.status).to.equal(401);
