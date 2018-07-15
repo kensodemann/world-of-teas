@@ -3,11 +3,11 @@
 import Vue from 'vue';
 import Page from '@/components/pages/profile';
 import store from '@/store';
-import util from '../../../util';
+import { mountComponent } from '../../../util';
 
 describe('profile.vue', () => {
   it('should render correct contents', () => {
-    const vm = util.mountComponent(Page);
+    const vm = mountComponent(Page);
     expect(
       vm.$el.querySelector('#profileFirstNameGroup label').textContent
     ).to.equal('First Name:');
@@ -30,7 +30,7 @@ describe('profile.vue', () => {
           email: 'fp@galactic.travels.com'
         }
       });
-      const vm = util.mountComponent(Page);
+      const vm = mountComponent(Page);
       expect(vm.form.id).to.equal(42);
       expect(vm.form.firstName).to.equal('Ford');
       expect(vm.form.lastName).to.equal('Prefect');
@@ -39,7 +39,7 @@ describe('profile.vue', () => {
 
     it('sets a watch if there is not user on create', async () => {
       store.commit('identity/logout');
-      const vm = util.mountComponent(Page);
+      const vm = mountComponent(Page);
       expect(vm.form.id).to.be.equal('');
       expect(vm.form.firstName).to.equal('');
       expect(vm.form.lastName).to.equal('');
@@ -64,7 +64,7 @@ describe('profile.vue', () => {
   describe('save', () => {
     let vm;
     beforeEach(() => {
-      vm = util.mountComponent(Page);
+      vm = mountComponent(Page);
       sinon.stub(vm.$store, 'dispatch');
       vm.$store.dispatch.returns(Promise.resolve({}));
     });

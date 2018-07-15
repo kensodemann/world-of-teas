@@ -5,7 +5,7 @@ import Vue from 'vue';
 import Page from '@/components/pages/browse-by-category';
 import store from '@/store';
 import mockHttp from '../../../mock-http';
-import util from '../../../util';
+import { mountComponent } from '../../../util';
 
 describe('browse-by-category.vue', () => {
   let teaCategories;
@@ -24,10 +24,8 @@ describe('browse-by-category.vue', () => {
 
   it('renders a card for each category', () => {
     store.commit('teaCategories/load', teaCategories);
-    const vm = util.mountComponent(Page);
-    const cards = vm.$el.querySelectorAll(
-      '.page .card'
-    );
+    const vm = mountComponent(Page);
+    const cards = vm.$el.querySelectorAll('.page .card');
     expect(cards.length).to.equal(teaCategories.length);
     for (let i = 0; i < cards.length; i++) {
       const title = cards[i].querySelector('.card-title');
@@ -37,16 +35,12 @@ describe('browse-by-category.vue', () => {
 
   it('renders a card for each category if loaded after the page is initially rendered', async () => {
     store.commit('teaCategories/load', []);
-    const vm = util.mountComponent(Page);
-    let cards = vm.$el.querySelectorAll(
-      '.page .card'
-    );
+    const vm = mountComponent(Page);
+    let cards = vm.$el.querySelectorAll('.page .card');
     expect(cards.length).to.equal(0);
     store.commit('teaCategories/load', teaCategories);
     await Vue.nextTick();
-    cards = vm.$el.querySelectorAll(
-      '.page .card'
-    );
+    cards = vm.$el.querySelectorAll('.page .card');
     expect(cards.length).to.equal(teaCategories.length);
     for (let i = 0; i < cards.length; i++) {
       const title = cards[i].querySelector('.card-title');

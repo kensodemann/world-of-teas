@@ -5,7 +5,7 @@ import Page from '@/components/pages/change-password';
 import store from '@/store';
 
 import mockHttp from '../../../mock-http';
-import util from '../../../util';
+import { mountComponent } from '../../../util';
 
 describe('change-password.vue', () => {
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('change-password.vue', () => {
           lastName: 'Cooper'
         }
       });
-      vm = util.mountComponent(Page);
+      vm = mountComponent(Page);
       sinon.stub(vm.$router, 'replace');
     });
 

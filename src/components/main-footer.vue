@@ -5,6 +5,16 @@
   </div>
 </template>
 
+<style lang="scss" scoped>
+@import "../scss/theme";
+
+.footer {
+  text-align: center;
+  color: $primary;
+  font-size: smaller;
+}
+</style>
+
 <script>
 import moment from 'moment';
 import version from '../assets/version.json';
@@ -19,13 +29,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-@import "../scss/theme";
-
-.footer {
-  text-align: center;
-  color: $primary;
-  font-size: smaller;
-}
-</style>

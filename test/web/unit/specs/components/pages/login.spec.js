@@ -2,11 +2,11 @@
 
 import Vue from 'vue';
 import Page from '@/components/pages/login';
-import util from '../../../util';
+import { mountComponent } from '../../../util';
 
 describe('login.vue', () => {
   it('renders the correct title', () => {
-    const vm = util.mountComponent(Page);
+    const vm = mountComponent(Page);
     expect(vm.$el.querySelector('.login .page-title').textContent).to.equal(
       'Login'
     );
@@ -15,7 +15,7 @@ describe('login.vue', () => {
   describe('login', () => {
     let vm;
     beforeEach(() => {
-      vm = util.mountComponent(Page);
+      vm = mountComponent(Page);
       sinon.spy(vm.$router, 'replace');
       sinon.stub(vm.$store, 'dispatch');
       vm.$store.dispatch.returns(Promise.resolve({ success: false }));
