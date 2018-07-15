@@ -26,8 +26,7 @@ module.exports = class Users {
       )
       : client.query(`select ${columns} from users where id = $1`, [id]));
     client.release();
-    const user =
-      data.rows && data.rows[0] ? Object.assign({}, data.rows[0]) : undefined;
+    const user = data.rows && data.rows[0] ? { ...data.rows[0] } : undefined;
     if (user) {
       user.roles = ['admin', 'user'];
     }

@@ -31,7 +31,7 @@ describe('route: /api/teas-purchase-links', () => {
       if (link.id && !testData.find(item => item.id === link.id)) {
         return Promise.resolve();
       }
-      const value = Object.assign({}, { id: 314159 }, link);
+      const value = { ...{ id: 314159 }, ...link };
       return Promise.resolve(value);
     }
 

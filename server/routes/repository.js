@@ -34,7 +34,7 @@ module.exports = class Repository {
 
   async insert(req, res) {
     try {
-      let item = Object.assign({}, req.body);
+      let item = { ...req.body };
       delete item.id;
       const data = await this._service.save(item);
       res.send(data);
@@ -45,9 +45,7 @@ module.exports = class Repository {
 
   async update(req, res) {
     try {
-      const item = Object.assign({}, req.body, {
-        id: parseInt(req.params.id)
-      });
+      const item = { ...req.body, ...{ id: parseInt(req.params.id) } };
       const data = await this._service.save(item);
       if (!data) {
         res.status(404);

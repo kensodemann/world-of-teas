@@ -34,7 +34,7 @@ describe('route: /api/teas', () => {
       if (tea.id && !testData.find(item => item.id === tea.id)) {
         return Promise.resolve();
       }
-      const value = Object.assign({}, { id: 314159 }, tea);
+      const value = { ...{ id: 314159 }, ...tea };
       return Promise.resolve(value);
     }
 
@@ -237,7 +237,7 @@ describe('route: /api/teas', () => {
       mockJWT.verify.throws(new Error('no loggy loggy'));
       request(app)
         .delete('/api/teas/30')
-        .send({ })
+        .send({})
         .end((err, res) => {
           expect(deleteCalled).to.equal(0);
           expect(res.status).to.equal(401);
