@@ -34,7 +34,7 @@ describe('route: /api/teas', () => {
       if (tea.id && !testData.find(item => item.id === tea.id)) {
         return Promise.resolve();
       }
-      const value = Object.assign({}, { id: 314159 }, tea);
+      const value = { ...{ id: 314159 }, ...tea };
       return Promise.resolve(value);
     }
 

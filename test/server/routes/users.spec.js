@@ -32,7 +32,7 @@ describe('route: /api/users', () => {
       if (user.id && !testData.find(item => item.id === user.id)) {
         return Promise.resolve();
       }
-      const value = Object.assign({}, { id: 314159 }, user);
+      const value = { ...{ id: 314159 }, ...user };
       return Promise.resolve(value);
     }
   }

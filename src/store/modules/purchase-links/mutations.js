@@ -38,5 +38,5 @@ function hash(hash, data) {
     }
     newHash[element.teaId].push(element);
   });
-  return Object.assign({}, hash, newHash);
+  return { ...hash, ...newHash };
 }
