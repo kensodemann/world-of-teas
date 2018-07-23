@@ -5,6 +5,7 @@ const express = require('express');
 const MockPool = require('../mocks/mock-pool');
 const proxyquire = require('proxyquire');
 const request = require('supertest');
+const sinon = require('sinon');
 
 describe('route: /api/tea-categories', () => {
   let app;
@@ -17,6 +18,21 @@ describe('route: /api/tea-categories', () => {
   }
 
   beforeEach(() => {
+    const mockJWT = {};
+    const AuthService = proxyquire('../../../server/services/authentication', {
+      jsonwebtoken: mockJWT
+    });
+    sinon.stub(mockJWT, 'verify');
+    mockJWT.verify.returns({
+      id: 1138,
+      firstName: 'Ted',
+      lastName: 'Senspeck',
+      roles: ['admin'],
+      iat: 'whatever',
+      exp: 19930124509912485
+    });
+    const auth = new AuthService();
+
     app = express();
     require('../../../server/config/express')(app);
     const pool = new MockPool();
@@ -39,7 +55,7 @@ describe('route: /api/tea-categories', () => {
     ];
     proxyquire('../../../server/routes/tea-categories', {
       '../services/tea-categories': MockTeaCategoryService
-    })(app, pool);
+    })(app, auth, pool);
   });
 
   describe('get', () => {

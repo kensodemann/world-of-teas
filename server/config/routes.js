@@ -10,7 +10,7 @@ module.exports = (app, pool) => {
   app.use('/', express.static(path.join(__dirname, '/../../dist')));
 
   require('../routes/athentication')(app, auth);
-  require('../routes/tea-categories')(app, pool);
+  require('../routes/tea-categories')(app, auth, pool);
   require('../routes/tea-purchase-links')(app, auth, pool);
   require('../routes/teas')(app, auth, pool);
   require('../routes/users')(app, auth, pool);
