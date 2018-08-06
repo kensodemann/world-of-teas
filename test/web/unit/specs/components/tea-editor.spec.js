@@ -1,7 +1,8 @@
 'use strict';
 
-import Component from '@/components/tea-editor';
+import Vue from 'vue';
 
+import Component from '@/components/tea-editor';
 import { mountComponent } from '../../util';
 
 describe('tea-editor.vue', () => {
@@ -48,6 +49,38 @@ describe('tea-editor.vue', () => {
         }
       });
     });
+
+    describe('can save', () => {
+      it('starts false', () => {
+        const vm = mountComponent(Component);
+        expect(vm.canSave).to.be.false;
+      });
+
+      it('is true when required fields have values', async () => {
+        const vm = mountComponent(Component);
+        await setInput(vm, '#teaEditorNameInput', 'a');
+        expect(vm.canSave).to.be.false;
+        await setSelect(vm, '#teaEditorCategorySelect', {
+          id: 3,
+          name: 'Herbal',
+          description: 'Not a tea'
+        });
+        expect(vm.canSave).to.be.true;
+      });
+
+      it('is false if there is an error', async () => {
+        const vm = mountComponent(Component);
+        await setInput(vm, '#teaEditorNameInput', 'a');
+        await setSelect(vm, '#teaEditorCategorySelect', {
+          id: 3,
+          name: 'Herbal',
+          description: 'Not a tea'
+        });
+        expect(vm.canSave).to.be.true;
+        await setInput(vm, '#teaEditorNameInput', '');
+        expect(vm.canSave).to.be.false;
+      });
+    });
   });
 
   describe('updating an existing tea', () => {
@@ -62,5 +95,21 @@ describe('tea-editor.vue', () => {
 
       it('loads the data', () => {});
     });
+
+    describe('can save', () => {});
   });
+
+  async function setInput(vm, id, value) {
+    const inp = vm.$el.querySelector(id);
+    inp.value = value;
+    inp.dispatchEvent(new Event('input'));
+    await Vue.nextTick();
+  }
+
+  async function setSelect(vm, id, value) {
+    const sel = vm.$el.querySelector(id);
+    sel.value = value;
+    sel.dispatchEvent(new Event('change'));
+    await Vue.nextTick();
+  }
 });

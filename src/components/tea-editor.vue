@@ -1,5 +1,8 @@
 <template>
-  <div class="tea-editor">
+  <b-modal id="teaEditor"
+           :ok-disabled=!canSave
+           size="lg"
+           title="Tea">
     <b-form>
       <b-form-group id="teaEditorNameGroup"
                     label="Name:"
@@ -86,7 +89,7 @@
         </b-form-group>
       </div>
     </b-form>
-  </div>
+  </b-modal>
 </template>
 
 <style lang="scss" scoped>
@@ -121,6 +124,9 @@ export default {
         );
       }
       return cats;
+    },
+    canSave: function() {
+      return !!(this.form.name && this.form.category && !this.errors.count());
     }
   },
   data() {

@@ -18,11 +18,7 @@
     <div class="list tea-list">
     </div>
 
-    <b-modal id="teaEditor"
-             size="lg"
-             title="Tea">
-      <tea-editor></tea-editor>
-    </b-modal>
+    <tea-editor></tea-editor>
   </div>
 </template>
 
