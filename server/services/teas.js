@@ -37,7 +37,7 @@ module.exports = class Teas {
     const client = await this._pool.connect();
     if (id) {
       await client.query(
-        `update teas set name = $1, tea_category_id = $2, description = $3, instructions = $4, rating = $5 where id = $5`,
+        `update teas set name = $1, tea_category_rid = $2, description = $3, instructions = $4, rating = $5 where id = $6`,
         [
           tea.name,
           tea.teaCategoryId,
@@ -48,7 +48,16 @@ module.exports = class Teas {
         ]
       );
     } else {
-      const ins = await client.query('insert into teas (name, tea_category, description, instructions, rating) values ($1, $2, $3, $4, $5) returning id');
+      const ins = await client.query(
+        'insert into teas (name, tea_category_rid, description, instructions, rating) values ($1, $2, $3, $4, $5) returning id',
+        [
+          tea.name,
+          tea.teaCategoryId,
+          tea.description,
+          tea.instructions,
+          tea.rating
+        ]
+      );
       id = ins.rows && ins.rows[0].id;
     }
     const qres = await client.query(

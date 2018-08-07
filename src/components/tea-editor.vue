@@ -1,6 +1,7 @@
 <template>
   <b-modal id="teaEditor"
            :ok-disabled=!canSave
+           @ok="save"
            size="lg"
            title="Tea">
     <b-form>
@@ -48,7 +49,7 @@
                          name="teaEditorInstructionsInput"
                          :rows="3"
                          data-vv-as="brewing instructions"
-                         v-model="form.instructionss"
+                         v-model="form.instructions"
                          placeholder="Enter Brewing Instructions">
         </b-form-textarea>
         <small class="text-danger" v-show="errors.has('teaEditorInstructionsInput')">{{ errors.first('teaEditorInstructionsInput') }}</small>
@@ -57,7 +58,7 @@
       <b-form-group id="teaEditorRatingGroup"
                     label="Rating"
                     label-for="teaEditorRating">
-        <rating id="teaEditorRating"></rating>
+        <rating id="teaEditorRating" name="teaEditorRating" v-model="form.rating"></rating>
       </b-form-group>
 
       <div class="d-flex">
@@ -82,7 +83,7 @@
                         name="teaEditorPurchasePriceInput"
                         data-vv-as="purchase price"
                         type="number"
-                        v-model="form.link"
+                        v-model="form.price"
                         placeholder="Per 100g">
           </b-form-input>
           <small class="text-danger" v-show="errors.has('teaEditorPurchasePriceInput')">{{ errors.first('teaEditorPurchasePriceInput') }}</small>
@@ -135,9 +136,28 @@ export default {
         name: '',
         description: '',
         instructions: '',
-        category: null
+        rating: undefined,
+        category: null,
+        link: '',
+        price: undefined
       }
     };
+  },
+  methods: {
+    save(evt) {
+      try {
+        this.$store.dispatch('teas/save', {
+          name: this.form.name,
+          teaCategoryId: this.form.category.id,
+          teaCategoryName: this.form.category.name,
+          description: this.form.description,
+          instructions: this.form.instructions,
+          rating: this.form.rating
+        });
+      } catch (err) {
+        this.errorMessage = err.body.reason;
+      }
+    }
   }
 };
 </script>

@@ -99,6 +99,49 @@ describe('tea-editor.vue', () => {
     describe('can save', () => {});
   });
 
+  describe('save', () => {
+    it('stores the data', async () => {
+      const vm = mountComponent(Component);
+      await setInput(vm, '#teaEditorNameInput', 'Herbal Lemon');
+      await setSelect(vm, '#teaEditorCategorySelect', {
+        id: 3,
+        name: 'Herbal',
+        description: 'Not a tea'
+      });
+      await setInput(
+        vm,
+        '#teaEditorDescriptionInput',
+        'Light and fresh and citrus'
+      );
+      await setInput(
+        vm,
+        '#teaEditorInstructionsInput',
+        'Put the bag in the hot water'
+      );
+      vm.form.rating = 3;
+      await setInput(
+        vm,
+        '#teaEditorPurchaseLinkInput',
+        'http://www.tea.com/lemon'
+      );
+      await setInput(vm, '#teaEditorPurchasePriceInput', 15.25);
+      sinon.stub(vm.$store, 'dispatch');
+      vm.save();
+      expect(vm.$store.dispatch.calledOnce).to.be.true;
+      expect(
+        vm.$store.dispatch.calledWith('teas/save', {
+          name: 'Herbal Lemon',
+          teaCategoryId: 1,
+          teaCategoryName: 'Green',
+          description: 'Light and fresh and citrus',
+          instructions: 'Put the bag in the hot water',
+          rating: 3
+        })
+      ).to.be.true;
+      vm.$store.dispatch.restore();
+    });
+  });
+
   async function setInput(vm, id, value) {
     const inp = vm.$el.querySelector(id);
     inp.value = value;
