@@ -178,7 +178,9 @@ describe('teas action', () => {
         teaCategoryName: 'Green',
         description: 'something about the tea',
         instructions: 'do something with the tea',
-        rating: 2
+        rating: 2,
+        url: 'https://www.myteas.com/green/grassy/42',
+        price: 35.99
       },
       {
         id: 20,

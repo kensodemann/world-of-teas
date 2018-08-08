@@ -4,7 +4,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import identity from './modules/identity';
-import purchaseLinks from './modules/purchase-links';
 import teaCategories from './modules/tea-categories';
 import teas from './modules/teas';
 
@@ -14,7 +13,6 @@ export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
   modules: {
     identity,
-    purchaseLinks,
     teaCategories,
     teas
   }

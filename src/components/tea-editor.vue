@@ -152,7 +152,9 @@ export default {
           teaCategoryName: this.form.category.name,
           description: this.form.description,
           instructions: this.form.instructions,
-          rating: this.form.rating
+          rating: this.form.rating,
+          url: this.form.link,
+          price: this.form.price
         });
       } catch (err) {
         this.errorMessage = err.body.reason;

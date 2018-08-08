@@ -6,7 +6,9 @@ export default [
     teaCategoryName: 'Green',
     description: 'something about the tea',
     instructions: 'do something with the tea',
-    rating: 2
+    rating: 2,
+    url: 'https://www.myteas.com/green/grassy/42',
+    price: 35.99
   },
   {
     id: 20,
@@ -25,7 +27,9 @@ export default [
     teaCategoryName: 'Black',
     description: 'flowery tea',
     instructions: 'do something with the tea',
-    rating: 3
+    rating: 3,
+    url: 'https://www.flower-teas.com/4231415973',
+    price: 27.42
   },
   {
     id: 40,
@@ -34,7 +38,8 @@ export default [
     teaCategoryName: 'Black',
     description: 'Good basic tea',
     instructions: 'brew it hot',
-    rating: 4
+    rating: 4,
+    url: 'https://www.flower-teas.com/11193995043'
   },
   {
     id: 1138,
@@ -43,6 +48,7 @@ export default [
     teaCategoryName: 'Green',
     description: 'Just a good basic green tea',
     instructions: 'do not over-brew',
-    rating: 4
+    rating: 4,
+    price: 13.24
   }
 ];

@@ -22,7 +22,9 @@ describe('teas mutations', () => {
           teaCategoryName: 'Green',
           description: 'something about the tea',
           instructions: 'do something with the tea',
-          rating: 2
+          rating: 2,
+          url: 'https://www.myteas.com/green/grassy/42',
+          price: 35.99
         },
         20: {
           id: 20,
@@ -32,7 +34,9 @@ describe('teas mutations', () => {
           description:
             'A woody fermented tea with faint hints of mold and fungus',
           instructions: 'soak then brew',
-          rating: 5
+          rating: 5,
+          url: 'https://www.happyt.com/7331415942',
+          price: 24.42
         },
         30: {
           id: 30,
@@ -50,7 +54,8 @@ describe('teas mutations', () => {
           teaCategoryName: 'Black',
           description: 'Good basic tea',
           instructions: 'brew it hot',
-          rating: 4
+          rating: 4,
+          price: 15.75
         },
         1138: {
           id: 1138,
@@ -87,7 +92,9 @@ describe('teas mutations', () => {
           teaCategoryName: 'Green',
           description: 'something about the tea',
           instructions: 'do something with the tea',
-          rating: 2
+          rating: 2,
+          url: 'https://www.myteas.com/green/grassy/42',
+          price: 35.99
         },
         20: {
           id: 20,
@@ -97,7 +104,9 @@ describe('teas mutations', () => {
           description:
             'A woody fermented tea with faint hints of mold and fungus',
           instructions: 'soak then brew',
-          rating: 5
+          rating: 5,
+          url: 'https://www.happyt.com/7331415942',
+          price: 24.42
         },
         30: {
           id: 30,
@@ -115,7 +124,8 @@ describe('teas mutations', () => {
           teaCategoryName: 'Black',
           description: 'Good basic tea',
           instructions: 'brew it hot',
-          rating: 4
+          rating: 4,
+          price: 15.75
         },
         1138: {
           id: 1138,
@@ -133,12 +143,12 @@ describe('teas mutations', () => {
   describe('remove', () => {
     let state;
     beforeEach(() => {
-      state = { };
+      state = {};
       mutations.load(state, testData);
     });
 
     it('removes the tea from the list', () => {
-      mutations.remove(state, {id: 20});
+      mutations.remove(state, { id: 20 });
       expect(state.list).to.deep.equal([
         {
           id: 10,
@@ -147,7 +157,9 @@ describe('teas mutations', () => {
           teaCategoryName: 'Green',
           description: 'something about the tea',
           instructions: 'do something with the tea',
-          rating: 2
+          rating: 2,
+          url: 'https://www.myteas.com/green/grassy/42',
+          price: 35.99
         },
         {
           id: 30,
@@ -165,7 +177,8 @@ describe('teas mutations', () => {
           teaCategoryName: 'Black',
           description: 'Good basic tea',
           instructions: 'brew it hot',
-          rating: 4
+          rating: 4,
+          price: 15.75
         },
         {
           id: 1138,
@@ -180,7 +193,7 @@ describe('teas mutations', () => {
     });
 
     it('removes the tea from the hash', () => {
-      mutations.remove(state, {id: 20});
+      mutations.remove(state, { id: 20 });
       expect(state.hash).to.deep.equal({
         10: {
           id: 10,
@@ -189,7 +202,9 @@ describe('teas mutations', () => {
           teaCategoryName: 'Green',
           description: 'something about the tea',
           instructions: 'do something with the tea',
-          rating: 2
+          rating: 2,
+          url: 'https://www.myteas.com/green/grassy/42',
+          price: 35.99
         },
         30: {
           id: 30,
@@ -207,7 +222,8 @@ describe('teas mutations', () => {
           teaCategoryName: 'Black',
           description: 'Good basic tea',
           instructions: 'brew it hot',
-          rating: 4
+          rating: 4,
+          price: 15.75
         },
         1138: {
           id: 1138,
@@ -225,7 +241,7 @@ describe('teas mutations', () => {
   describe('save', () => {
     let state;
     beforeEach(() => {
-      state = { };
+      state = {};
       mutations.load(state, testData);
     });
 
@@ -328,7 +344,9 @@ describe('teas mutations', () => {
         teaCategoryName: 'Green',
         description: 'something about the tea',
         instructions: 'do something with the tea',
-        rating: 2
+        rating: 2,
+        url: 'https://www.myteas.com/green/grassy/42',
+        price: 35.99
       },
       {
         id: 20,
@@ -338,7 +356,9 @@ describe('teas mutations', () => {
         description:
           'A woody fermented tea with faint hints of mold and fungus',
         instructions: 'soak then brew',
-        rating: 5
+        rating: 5,
+        url: 'https://www.happyt.com/7331415942',
+        price: 24.42
       },
       {
         id: 30,
@@ -356,7 +376,8 @@ describe('teas mutations', () => {
         teaCategoryName: 'Black',
         description: 'Good basic tea',
         instructions: 'brew it hot',
-        rating: 4
+        rating: 4,
+        price: 15.75
       },
       {
         id: 1138,

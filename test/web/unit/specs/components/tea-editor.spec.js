@@ -135,7 +135,9 @@ describe('tea-editor.vue', () => {
           teaCategoryName: 'Green',
           description: 'Light and fresh and citrus',
           instructions: 'Put the bag in the hot water',
-          rating: 3
+          rating: 3,
+          url: 'http://www.tea.com/lemon',
+          price: '15.25'
         })
       ).to.be.true;
       vm.$store.dispatch.restore();
