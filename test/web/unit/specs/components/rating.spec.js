@@ -5,20 +5,20 @@ import Component from '@/components/rating';
 import { mountComponent } from '../../util';
 
 describe('rating.vue', () => {
-  it('renders five items', () => {
-    const vm = mountComponent(Component);
+  it('renders five items', async () => {
+    const vm = await mountComponent(Component);
     const stars = vm.$el.querySelectorAll('.fa');
     expect(stars.length).to.equal(5);
   });
 
-  it('renders all five as outlined stars', () => {
-    const vm = mountComponent(Component);
+  it('renders all five as outlined stars', async () => {
+    const vm = await mountComponent(Component);
     const stars = vm.$el.querySelectorAll('.fa-star-o');
     expect(stars.length).to.equal(5);
   });
 
   it('renders the proper number of filled in stars', async () => {
-    const vm = mountComponent(Component);
+    const vm = await mountComponent(Component);
     vm.stars = 3;
     await Vue.nextTick();
     const solid = vm.$el.querySelectorAll('.fa-star');
@@ -28,8 +28,8 @@ describe('rating.vue', () => {
   });
 
   describe('on value updated', () => {
-    it('emits an input event', () => {
-      const vm = mountComponent(Component);
+    it('emits an input event', async () => {
+      const vm = await mountComponent(Component);
       sinon.spy(vm, '$emit');
       vm.updateValue(2);
       expect(vm.$emit.calledOnce).to.be.true;
@@ -37,7 +37,7 @@ describe('rating.vue', () => {
     });
 
     it('shades the proper number of stars', async () => {
-      const vm = mountComponent(Component);
+      const vm = await mountComponent(Component);
       sinon.spy(vm, '$emit');
       vm.updateValue(2);
       await Vue.nextTick();

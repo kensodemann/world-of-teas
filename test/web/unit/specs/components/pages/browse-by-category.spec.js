@@ -11,9 +11,7 @@ import { mountComponent } from '../../../util';
 describe('browse-by-category.vue', () => {
   let vm;
   beforeEach(async () => {
-    vm = mountComponent(Page);
-    await Vue.nextTick(); // complete the dispatch then re-render
-    await Vue.nextTick();
+    vm = await mountComponent(Page);
   });
 
   it('renders a card for each category', async () => {

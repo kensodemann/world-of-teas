@@ -6,22 +6,22 @@ import Component from '@/components/tea-editor';
 import { mountComponent } from '../../util';
 
 describe('tea-editor.vue', () => {
-  it('can be instantiated', () => {
-    const vm = mountComponent(Component);
+  it('can be instantiated', async () => {
+    const vm = await mountComponent(Component);
     expect(vm).to.exist;
   });
 
   describe('category options', () => {
-    it('contains a non-value option', () => {
-      const vm = mountComponent(Component);
+    it('contains a non-value option', async () => {
+      const vm = await mountComponent(Component);
       expect(vm.categoryOptions[0]).to.deep.equal({
         value: null,
         text: 'Please select a category'
       });
     });
 
-    it('contains an entry for each category in the store', () => {
-      const vm = mountComponent(Component);
+    it('contains an entry for each category in the store', async () => {
+      const vm = await mountComponent(Component);
       const cats = vm.$store.state.teaCategories.list;
       expect(vm.categoryOptions.length).to.equal(cats.length + 1);
       for (let idx = 0; idx < cats.length; idx++) {
@@ -33,16 +33,16 @@ describe('tea-editor.vue', () => {
 
   describe('creating a new tea', () => {
     describe('initial render', () => {
-      it('hides all error messages', () => {
-        const vm = mountComponent(Component);
+      it('hides all error messages', async () => {
+        const vm = await mountComponent(Component);
         const msgs = vm.$el.querySelectorAll('small.text-danger');
         for (let idx = 0; idx < msgs.length; idx++) {
           expect(msgs[idx].style.display).to.equal('none');
         }
       });
 
-      it('contains no data', () => {
-        const vm = mountComponent(Component);
+      it('contains no data', async () => {
+        const vm = await mountComponent(Component);
         const inputs = vm.$el.querySelectorAll('input');
         for (let idx = 0; idx < inputs.length; idx++) {
           expect(inputs[0].value).to.equal('');
@@ -51,13 +51,13 @@ describe('tea-editor.vue', () => {
     });
 
     describe('can save', () => {
-      it('starts false', () => {
-        const vm = mountComponent(Component);
+      it('starts false', async () => {
+        const vm = await mountComponent(Component);
         expect(vm.canSave).to.be.false;
       });
 
       it('is true when required fields have values', async () => {
-        const vm = mountComponent(Component);
+        const vm = await mountComponent(Component);
         await setInput(vm, '#teaEditorNameInput', 'a');
         expect(vm.canSave).to.be.false;
         await setSelect(vm, '#teaEditorCategorySelect', {
@@ -69,7 +69,7 @@ describe('tea-editor.vue', () => {
       });
 
       it('is false if there is an error', async () => {
-        const vm = mountComponent(Component);
+        const vm = await mountComponent(Component);
         await setInput(vm, '#teaEditorNameInput', 'a');
         await setSelect(vm, '#teaEditorCategorySelect', {
           id: 3,
@@ -85,8 +85,8 @@ describe('tea-editor.vue', () => {
 
   describe('updating an existing tea', () => {
     describe('initial render', () => {
-      it('hides all error messages', () => {
-        const vm = mountComponent(Component);
+      it('hides all error messages', async () => {
+        const vm = await mountComponent(Component);
         const msgs = vm.$el.querySelectorAll('small.text-danger');
         for (let idx = 0; idx < msgs.length; idx++) {
           expect(msgs[idx].style.display).to.equal('none');
@@ -101,7 +101,7 @@ describe('tea-editor.vue', () => {
 
   describe('save', () => {
     it('stores the data', async () => {
-      const vm = mountComponent(Component);
+      const vm = await mountComponent(Component);
       await setInput(vm, '#teaEditorNameInput', 'Herbal Lemon');
       await setSelect(vm, '#teaEditorCategorySelect', {
         id: 3,

@@ -6,8 +6,8 @@ import store from '@/store';
 import { mountComponent } from '../../../util';
 
 describe('profile.vue', () => {
-  it('should render correct contents', () => {
-    const vm = mountComponent(Page);
+  it('should render correct contents', async () => {
+    const vm = await mountComponent(Page);
     expect(
       vm.$el.querySelector('#profileFirstNameGroup label').textContent
     ).to.equal('First Name:');
@@ -20,7 +20,7 @@ describe('profile.vue', () => {
   });
 
   describe('created hook', () => {
-    it('assigns the form data', () => {
+    it('assigns the form data', async () => {
       store.commit('identity/login', {
         token: 'IAmAToken',
         user: {
@@ -30,7 +30,7 @@ describe('profile.vue', () => {
           email: 'fp@galactic.travels.com'
         }
       });
-      const vm = mountComponent(Page);
+      const vm = await mountComponent(Page);
       expect(vm.form.id).to.equal(42);
       expect(vm.form.firstName).to.equal('Ford');
       expect(vm.form.lastName).to.equal('Prefect');
@@ -39,7 +39,7 @@ describe('profile.vue', () => {
 
     it('sets a watch if there is not user on create', async () => {
       store.commit('identity/logout');
-      const vm = mountComponent(Page);
+      const vm = await mountComponent(Page);
       expect(vm.form.id).to.be.equal('');
       expect(vm.form.firstName).to.equal('');
       expect(vm.form.lastName).to.equal('');
@@ -63,8 +63,8 @@ describe('profile.vue', () => {
 
   describe('save', () => {
     let vm;
-    beforeEach(() => {
-      vm = mountComponent(Page);
+    beforeEach(async () => {
+      vm = await mountComponent(Page);
       sinon.stub(vm.$store, 'dispatch');
       vm.$store.dispatch.returns(Promise.resolve({}));
     });

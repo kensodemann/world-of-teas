@@ -17,14 +17,14 @@ describe('tea-category.vue', () => {
   });
 
   describe('title', () => {
-    it('renders correctly', () => {
-      const vm = mountComponent(Component, properties);
+    it('renders correctly', async () => {
+      const vm = await mountComponent(Component, properties);
       const title = vm.$el.querySelector('.card-title');
       expect(title.textContent).to.equal('Green');
     });
 
     it('responds to changes', async () => {
-      const vm = mountComponent(Component, properties);
+      const vm = await mountComponent(Component, properties);
       vm.category = {
         id: 2,
         name: 'Herbal',
@@ -37,14 +37,14 @@ describe('tea-category.vue', () => {
   });
 
   describe('description', () => {
-    it('renders correctly', () => {
-      const vm = mountComponent(Component, properties);
+    it('renders correctly', async () => {
+      const vm = await mountComponent(Component, properties);
       const text = vm.$el.querySelector('.card-text');
       expect(text.textContent.trim()).to.equal('Looks and tastes like grass');
     });
 
     it('responds to changes', async () => {
-      const vm = mountComponent(Component, properties);
+      const vm = await mountComponent(Component, properties);
       vm.category = {
         id: 2,
         name: 'Herbal',
@@ -57,14 +57,14 @@ describe('tea-category.vue', () => {
   });
 
   describe('button text', () => {
-    it('renders correctly', () => {
-      const vm = mountComponent(Component, properties);
+    it('renders correctly', async () => {
+      const vm = await mountComponent(Component, properties);
       const btn = vm.$el.querySelector('.btn-primary');
       expect(btn.textContent.trim()).to.equal('List Green Teas');
     });
 
     it('responds to changes', async () => {
-      const vm = mountComponent(Component, properties);
+      const vm = await mountComponent(Component, properties);
       vm.category = {
         id: 2,
         name: 'Herbal',
@@ -77,14 +77,14 @@ describe('tea-category.vue', () => {
   });
 
   describe('image', () => {
-    it('renders correctly', () => {
-      const vm = mountComponent(Component, properties);
+    it('renders correctly', async () => {
+      const vm = await mountComponent(Component, properties);
       const img = vm.$el.querySelector('.card-img-top');
       expect(img.src).to.contain('/static/img/green.jpg');
     });
 
     it('responds to changes', async () => {
-      const vm = mountComponent(Component, properties);
+      const vm = await mountComponent(Component, properties);
       vm.category = {
         id: 2,
         name: 'Herbal',

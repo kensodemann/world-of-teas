@@ -8,8 +8,8 @@ import dataServiceLogger from '@/assets/test-data/data-service-logger';
 
 describe('change-password.vue', () => {
   let vm;
-  beforeEach(() => {
-    vm = mountComponent(Page);
+  beforeEach(async () => {
+    vm = await mountComponent(Page);
     dataServiceLogger.reset();
   });
 

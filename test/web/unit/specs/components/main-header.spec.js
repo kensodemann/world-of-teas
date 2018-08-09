@@ -5,15 +5,15 @@ import store from '@/store';
 import { mountComponent } from '../../util';
 
 describe('main-header.vue', () => {
-  it('should render the brand', () => {
-    const vm = mountComponent(Component);
+  it('should render the brand', async () => {
+    const vm = await mountComponent(Component);
     const links = vm.$el.querySelectorAll('.navbar-brand');
     expect(links.length).to.equal(1);
     expect(links[0].textContent).to.equal('World of Teas');
   });
 
-  it('should render correct links', () => {
-    const vm = mountComponent(Component);
+  it('should render correct links', async () => {
+    const vm = await mountComponent(Component);
     const links = vm.$el.querySelectorAll('.nav-item');
     expect(links.length).to.equal(4);
     expect(links[0].textContent).to.equal('Categories');
@@ -22,7 +22,7 @@ describe('main-header.vue', () => {
     expect(links[3].textContent).to.equal('Login');
   });
 
-  it('switches from login to the usernane', () => {
+  it('switches from login to the usernane', async () => {
     store.commit('identity/login', {
       token: 'asdfiig93',
       user: {
@@ -31,7 +31,7 @@ describe('main-header.vue', () => {
         lastName: 'Cooper'
       }
     });
-    const vm = mountComponent(Component);
+    const vm = await mountComponent(Component);
     const links = vm.$el.querySelectorAll('.nav-item');
     expect(links.length).to.equal(4);
     expect(links[0].textContent).to.equal('Categories');
