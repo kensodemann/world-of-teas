@@ -1,24 +1,19 @@
 'use strict';
 
-import Vue from 'vue';
 import Page from '@/components/pages/change-password';
 import store from '@/store';
 
-import mockHttp from '../../../mock-http';
 import { mountComponent } from '../../../util';
+import dataServiceLogger from '@/assets/test-data/data-service-logger';
 
 describe('change-password.vue', () => {
+  let vm;
   beforeEach(() => {
-    mockHttp.initialize();
-  });
-
-  afterEach(() => {
-    mockHttp.restore();
+    vm = mountComponent(Page);
+    dataServiceLogger.reset();
   });
 
   it('should render correct contents', () => {
-    const Constructor = Vue.extend(Page);
-    const vm = new Constructor().$mount();
     expect(
       vm.$el.querySelector('#changePasswordCurrentPasswordGroup label')
         .textContent
@@ -33,9 +28,7 @@ describe('change-password.vue', () => {
   });
 
   describe('change password', () => {
-    let vm;
     beforeEach(() => {
-      mockHttp.setPostResponse('/api/users/73/password', { status: 200 });
       store.commit('identity/login', {
         token: 'asdfiig93',
         user: {
@@ -44,7 +37,6 @@ describe('change-password.vue', () => {
           lastName: 'Cooper'
         }
       });
-      vm = mountComponent(Page);
       sinon.stub(vm.$router, 'replace');
     });
 
@@ -56,21 +48,21 @@ describe('change-password.vue', () => {
       vm.form.currentPassword = 'SomethingBad';
       vm.form.newPassword = 'SomethingM0r3Secure';
       await vm.changePassword();
-      expect(Vue.http.post.calledOnce).to.be.true;
-      expect(
-        Vue.http.post.calledWith('/api/users/73/password', {
-          currentPassword: 'SomethingBad',
-          password: 'SomethingM0r3Secure'
-        })
-      ).to.be.true;
+      expect(dataServiceLogger.requests.length).to.equal(1);
+      expect(dataServiceLogger.requests[0].url).to.equal(
+        '/api/users/73/password'
+      );
+      expect(dataServiceLogger.requests[0].method).to.equal('POST');
+      expect(dataServiceLogger.requests[0].body).to.deep.equal({
+        currentPassword: 'SomethingBad',
+        password: 'SomethingM0r3Secure'
+      });
     });
 
     describe('on success', () => {
       it('should navigate to the profile page', async () => {
-        mockHttp.setPostResponse('/api/users/73/password', {
-          status: 200,
-          body: { success: true }
-        });
+        vm.form.currentPassword = 'SomethingBad';
+        vm.form.newPassword = 'SomethingM0r3Secure';
         await vm.changePassword();
         expect(vm.$router.replace.calledOnce).to.be.true;
         expect(vm.$router.replace.calledWith('/profile')).to.be.true;
@@ -78,21 +70,18 @@ describe('change-password.vue', () => {
     });
 
     describe('on failure', () => {
-      beforeEach(() => {
-        mockHttp.setPostResponse('/api/users/73/password', {
-          status: 400,
-          body: { reason: 'Error: Invalid Password' }
-        });
-      });
-
       it('should not navigate', async () => {
+        vm.form.currentPassword = 'WrongPassword';
+        vm.form.newPassword = 'SomethingM0r3Secure';
         await vm.changePassword();
         expect(vm.$router.replace.called).to.be.false;
       });
 
       it('should show an error message', async () => {
+        vm.form.currentPassword = 'WrongPassword';
+        vm.form.newPassword = 'SomethingM0r3Secure';
         await vm.changePassword();
-        expect(vm.errorMessage).to.equal('Error: Invalid Password');
+        expect(vm.errorMessage).to.equal('Error: Invalid Password.');
       });
     });
   });

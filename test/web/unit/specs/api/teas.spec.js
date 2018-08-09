@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 import teas from '@/api/teas';
-import mockHttp from '../../mock-http';
+import mockHttp from './mock-http';
 
 describe('teas', () => {
   let testData;

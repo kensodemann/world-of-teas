@@ -71,6 +71,21 @@ export default {
       };
     }
   },
+  ['POST /api/users/73/password'](pathMatch, query, request) {
+    logger.log(pathMatch, query, request);
+    if (request.body && request.body.currentPassword === 'SomethingBad') {
+      return {
+        body: {success: true},
+        status: 200,
+        statusText: 'OK'
+      };
+    } else {
+      return {
+        body: {reason: 'Error: Invalid Password.'},
+        status: 400
+      };
+    }
+  },
   ['GET /api/users/current'](pathMatch, query, request) {
     const body = users.current;
     logger.log(pathMatch, query, request);

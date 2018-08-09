@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 import authentication from '@/api/authentication';
-import mockHttp from '../../mock-http';
+import mockHttp from './mock-http';
 
 const loginResponse = {
   success: true,

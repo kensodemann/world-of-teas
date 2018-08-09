@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 import users from '@/api/users';
-import mockHttp from '../../mock-http';
+import mockHttp from './mock-http';
 
 describe('users', () => {
   beforeEach(() => {

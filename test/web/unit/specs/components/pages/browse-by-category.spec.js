@@ -4,27 +4,19 @@ import Vue from 'vue';
 
 import Page from '@/components/pages/browse-by-category';
 import store from '@/store';
-import mockHttp from '../../../mock-http';
+import teaCategories from '@/assets/test-data/tea-categories';
+
 import { mountComponent } from '../../../util';
 
 describe('browse-by-category.vue', () => {
-  let teaCategories;
-  beforeEach(() => {
-    initializeTestData();
-    mockHttp.initialize();
-    mockHttp.setResponse('/api/tea-categories', {
-      status: 200,
-      body: teaCategories
-    });
+  let vm;
+  beforeEach(async () => {
+    vm = mountComponent(Page);
+    await Vue.nextTick(); // complete the dispatch then re-render
+    await Vue.nextTick();
   });
 
-  afterEach(() => {
-    mockHttp.restore();
-  });
-
-  it('renders a card for each category', () => {
-    store.commit('teaCategories/load', teaCategories);
-    const vm = mountComponent(Page);
+  it('renders a card for each category', async () => {
     const cards = vm.$el.querySelectorAll('.page .card');
     expect(cards.length).to.equal(teaCategories.length);
     for (let i = 0; i < cards.length; i++) {
@@ -35,7 +27,7 @@ describe('browse-by-category.vue', () => {
 
   it('renders a card for each category if loaded after the page is initially rendered', async () => {
     store.commit('teaCategories/load', []);
-    const vm = mountComponent(Page);
+    await Vue.nextTick();
     let cards = vm.$el.querySelectorAll('.page .card');
     expect(cards.length).to.equal(0);
     store.commit('teaCategories/load', teaCategories);
@@ -47,29 +39,4 @@ describe('browse-by-category.vue', () => {
       expect(title.textContent).to.equal(vm.categories[i].name);
     }
   });
-
-  function initializeTestData() {
-    teaCategories = [
-      {
-        id: 1,
-        name: 'Green',
-        description: 'Non - oxidized, mild tea'
-      },
-      {
-        id: 2,
-        name: 'Black',
-        description: 'Oxidized tea'
-      },
-      {
-        id: 3,
-        name: 'Herbal',
-        description: 'Not a tea'
-      },
-      {
-        id: 4,
-        name: 'Oolong',
-        description: 'Chinese deliciousness'
-      }
-    ];
-  }
 });
