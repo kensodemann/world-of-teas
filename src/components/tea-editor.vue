@@ -1,6 +1,7 @@
 <template>
   <b-modal id="teaEditor"
-           :ok-disabled=!canSave
+           ref="teaEditorModel"
+           :ok-disabled=!canSave()
            @ok="save"
            size="lg"
            title="Tea">
@@ -69,7 +70,7 @@
                         name="teaEditorPurchaseLinkInput"
                         data-vv-as="purchase link"
                         type="url"
-                        v-model="form.link"
+                        v-model="form.url"
                         v-validate="'url'"
                         placeholder="Enter a Valid Link">
           </b-form-input>
@@ -113,7 +114,7 @@ export default {
     Rating
   },
   computed: {
-    categoryOptions: function() {
+    categoryOptions() {
       const cats = [{ value: null, text: 'Please select a category' }];
       if (this.$store.state.teaCategories.list) {
         Array.prototype.push.apply(
@@ -125,25 +126,43 @@ export default {
         );
       }
       return cats;
-    },
-    canSave: function() {
-      return !!(this.form.name && this.form.category && !this.errors.count());
     }
   },
   data() {
     return {
+      tea: undefined,
       form: {
         name: '',
         description: '',
         instructions: '',
         rating: undefined,
         category: null,
-        link: '',
+        url: '',
         price: undefined
       }
     };
   },
   methods: {
+    canSave() {
+      return !!(
+        this.isDirty() &&
+        this.form.name &&
+        this.form.category &&
+        !this.errors.count()
+      );
+    },
+    isDirty() {
+      return (
+        !this.tea ||
+        this.tea.name !== this.form.name ||
+        this.tea.teaCategoryId !== this.form.category.id ||
+        this.tea.description !== this.form.description ||
+        this.tea.instructions !== this.form.instructions ||
+        this.tea.rating !== this.form.rating ||
+        this.tea.url !== this.form.url ||
+        parseFloat(this.tea.price || 0) !== parseFloat(this.form.price || 0)
+      );
+    },
     save(evt) {
       try {
         this.$store.dispatch('teas/save', {
@@ -153,12 +172,25 @@ export default {
           description: this.form.description,
           instructions: this.form.instructions,
           rating: this.form.rating,
-          url: this.form.link,
+          url: this.form.url,
           price: this.form.price
         });
       } catch (err) {
         this.errorMessage = err.body.reason;
       }
+    },
+    show(tea) {
+      this.tea = tea;
+      this.form.name = tea && tea.name;
+      this.form.description = tea && tea.description;
+      this.form.instructions = tea && tea.instructions;
+      this.form.rating = tea && tea.rating;
+      this.form.url = tea && tea.url;
+      this.form.price = tea && tea.price;
+      this.form.category = tea
+        ? this.$store.state.teaCategories.hash[tea.teaCategoryId]
+        : null;
+      this.$refs.teaEditorModel.show();
     }
   }
 };

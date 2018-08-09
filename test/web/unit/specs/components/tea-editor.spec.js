@@ -32,17 +32,22 @@ describe('tea-editor.vue', () => {
   });
 
   describe('creating a new tea', () => {
+    let vm;
+    beforeEach(async () => {
+      vm = await mountComponent(Component);
+      vm.show();
+      await Vue.nextTick();
+    });
+
     describe('initial render', () => {
-      it('hides all error messages', async () => {
-        const vm = await mountComponent(Component);
-        const msgs = vm.$el.querySelectorAll('small.text-danger');
-        for (let idx = 0; idx < msgs.length; idx++) {
-          expect(msgs[idx].style.display).to.equal('none');
-        }
+      it('shows an error for the name', () => {
+        expect(vm.errors.count()).to.equal(1);
+        expect(vm.errors.first('teaEditorNameInput')).to.equal(
+          'The name field is required.'
+        );
       });
 
-      it('contains no data', async () => {
-        const vm = await mountComponent(Component);
+      it('contains no data', () => {
         const inputs = vm.$el.querySelectorAll('input');
         for (let idx = 0; idx < inputs.length; idx++) {
           expect(inputs[0].value).to.equal('');
@@ -51,63 +56,118 @@ describe('tea-editor.vue', () => {
     });
 
     describe('can save', () => {
-      it('starts false', async () => {
-        const vm = await mountComponent(Component);
-        expect(vm.canSave).to.be.false;
+      it('starts false', () => {
+        expect(vm.canSave()).to.be.false;
       });
 
       it('is true when required fields have values', async () => {
-        const vm = await mountComponent(Component);
         await setInput(vm, '#teaEditorNameInput', 'a');
-        expect(vm.canSave).to.be.false;
-        await setSelect(vm, '#teaEditorCategorySelect', {
-          id: 3,
-          name: 'Herbal',
-          description: 'Not a tea'
-        });
-        expect(vm.canSave).to.be.true;
+        expect(vm.canSave()).to.be.false;
+        await setSelect(vm, '#teaEditorCategorySelect', 1);
+        expect(vm.canSave()).to.be.true;
       });
 
       it('is false if there is an error', async () => {
-        const vm = await mountComponent(Component);
         await setInput(vm, '#teaEditorNameInput', 'a');
-        await setSelect(vm, '#teaEditorCategorySelect', {
-          id: 3,
-          name: 'Herbal',
-          description: 'Not a tea'
-        });
-        expect(vm.canSave).to.be.true;
-        await setInput(vm, '#teaEditorNameInput', '');
-        expect(vm.canSave).to.be.false;
+        await setSelect(vm, '#teaEditorCategorySelect', 1);
+        expect(vm.canSave()).to.be.true;
+        await setInput(vm, '#teaEditorPurchaseLinkInput', 'h');
+        await Vue.nextTick();
+        expect(vm.canSave()).to.be.false;
       });
     });
   });
 
   describe('updating an existing tea', () => {
-    describe('initial render', () => {
-      it('hides all error messages', async () => {
-        const vm = await mountComponent(Component);
-        const msgs = vm.$el.querySelectorAll('small.text-danger');
-        for (let idx = 0; idx < msgs.length; idx++) {
-          expect(msgs[idx].style.display).to.equal('none');
-        }
-      });
-
-      it('loads the data', () => {});
+    let vm;
+    let tea;
+    beforeEach(async () => {
+      vm = await mountComponent(Component);
+      tea = vm.$store.state.teas.hash[30];
+      vm.show(tea);
     });
 
-    describe('can save', () => {});
+    describe('initial render', () => {
+      it('starts with no error messages', () => {
+        expect(vm.errors.count()).to.equal(0);
+      });
+
+      it('initializes the form data', () => {
+        expect(vm.form.name).to.equal(tea.name);
+        expect(vm.form.description).to.equal(tea.description);
+        expect(vm.form.instructions).to.equal(tea.instructions);
+        expect(vm.form.url).to.equal(tea.url);
+        expect(vm.form.price).to.equal(tea.price);
+        expect(vm.form.rating).to.equal(tea.rating);
+        expect(vm.form.category).to.deep.equal(
+          vm.$store.state.teaCategories.hash[tea.teaCategoryId]
+        );
+      });
+    });
+
+    describe('can save', () => {
+      it('starts false', () => {
+        expect(vm.canSave()).to.be.false;
+      });
+
+      it('is true when the name changes', async () => {
+        await setInput(vm, '#teaEditorNameInput', tea.name + 'a');
+        expect(vm.canSave()).to.be.true;
+        await setInput(vm, '#teaEditorNameInput', tea.name);
+        expect(vm.canSave()).to.be.false;
+      });
+
+      it('is true when the type changes', async () => {
+        const idx = getSelectIndex(vm, '#teaEditorCategorySelect');
+        await setSelect(vm, '#teaEditorCategorySelect', idx - 1);
+        expect(vm.canSave()).to.be.true;
+        await setSelect(vm, '#teaEditorCategorySelect', idx);
+        expect(vm.canSave()).to.be.false;
+      });
+
+      it('is true when the description changes', async () => {
+        await setInput(vm, '#teaEditorDescriptionInput', tea.description + 'a');
+        expect(vm.canSave()).to.be.true;
+        await setInput(vm, '#teaEditorDescriptionInput', tea.description);
+        expect(vm.canSave()).to.be.false;
+      });
+
+      it('is true when the instructions change', async () => {
+        await setInput(vm, '#teaEditorInstructionsInput', tea.instructions + 'B');
+        expect(vm.canSave()).to.be.true;
+        await setInput(vm, '#teaEditorInstructionsInput', tea.instructions);
+        expect(vm.canSave()).to.be.false;
+      });
+
+      it('is true when the rating changes', () => {
+        vm.form.rating = tea.rating + 1;
+        expect(vm.canSave()).to.be.true;
+        vm.form.rating = tea.rating;
+        expect(vm.canSave()).to.be.false;
+      });
+
+      it('is true when the URL changes', async () => {
+        await setInput(vm, '#teaEditorPurchaseLinkInput', tea.url + 'l');
+        expect(vm.canSave()).to.be.true;
+        await setInput(vm, '#teaEditorPurchaseLinkInput', tea.url);
+        expect(vm.canSave()).to.be.false;
+      });
+
+      it('is true when the price changes', async () => {
+        await setInput(vm, '#teaEditorPurchasePriceInput', tea.price + 0.01);
+        expect(vm.canSave()).to.be.true;
+        await setInput(vm, '#teaEditorPurchasePriceInput', tea.price);
+        expect(vm.canSave()).to.be.false;
+      });
+    });
   });
 
   describe('save', () => {
     it('stores the data', async () => {
       const vm = await mountComponent(Component);
+      vm.show();
       await setInput(vm, '#teaEditorNameInput', 'Herbal Lemon');
-      await setSelect(vm, '#teaEditorCategorySelect', {
-        id: 3,
-        name: 'Herbal',
-        description: 'Not a tea'
-      });
+      await setSelect(vm, '#teaEditorCategorySelect', 1);
       await setInput(
         vm,
         '#teaEditorDescriptionInput',
@@ -151,10 +211,15 @@ describe('tea-editor.vue', () => {
     await Vue.nextTick();
   }
 
-  async function setSelect(vm, id, value) {
+  async function setSelect(vm, id, idx) {
     const sel = vm.$el.querySelector(id);
-    sel.value = value;
+    sel.selectedIndex = idx;
     sel.dispatchEvent(new Event('change'));
     await Vue.nextTick();
+  }
+
+  function getSelectIndex(vm, id) {
+    const sel = vm.$el.querySelector(id);
+    return sel.selectedIndex;
   }
 });

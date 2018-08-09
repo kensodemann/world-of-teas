@@ -11,14 +11,14 @@
                         placeholder="Search for Tea">
           </b-form-input>
         </b-form-group>
-        <b-button variant="primary" v-b-modal.teaEditor>+</b-button>
+        <b-button variant="primary" @click="showTea()">+</b-button>
       </div>
     </b-form>
 
     <div class="list tea-list">
     </div>
 
-    <tea-editor></tea-editor>
+    <tea-editor ref="teaEditor"></tea-editor>
   </div>
 </template>
 
@@ -41,6 +41,11 @@ export default {
     return {
       search: ''
     };
+  },
+  methods: {
+    showTea(tea) {
+      this.$refs.teaEditor.show(tea);
+    }
   }
 };
 </script>
