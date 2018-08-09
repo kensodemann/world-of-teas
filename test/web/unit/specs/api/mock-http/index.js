@@ -28,11 +28,12 @@ class MockHttp {
   }
 
   _setResponse(verb, endpoint, response) {
-    verb.withArgs(endpoint)
+    verb
+      .withArgs(endpoint)
       .returns(
-      response.status >= 400
-        ? Promise.reject(response)
-        : Promise.resolve(response)
+        response.status >= 400
+          ? Promise.reject(response)
+          : Promise.resolve(response)
       );
   }
 }
