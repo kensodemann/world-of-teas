@@ -10,4 +10,11 @@ describe('home.vue', () => {
       'Find Great Tea'
     );
   });
+
+  describe('teas', () => {
+    it('contains all of the teas by default', async () => {
+      const vm = await mountComponent(Page);
+      expect(vm.teas.length).to.equal(vm.$store.state.teas.list.length);
+    });
+  });
 });

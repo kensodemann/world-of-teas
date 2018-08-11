@@ -15,8 +15,9 @@
       </div>
     </b-form>
 
-    <div class="list tea-list">
-    </div>
+    <ul class="list tea-list">
+      <li v-for="tea of teas" :key="tea.name">{{tea.name}}</li>
+    </ul>
 
     <tea-editor ref="teaEditor"></tea-editor>
   </div>
@@ -41,6 +42,12 @@ export default {
     return {
       search: ''
     };
+  },
+  computed: {
+    teas() {
+      console.log('teas:', this.$store.state.teas.list);
+      return this.$store.state.teas.list;
+    }
   },
   methods: {
     showTea(tea) {
