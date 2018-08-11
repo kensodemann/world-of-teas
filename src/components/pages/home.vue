@@ -15,9 +15,13 @@
       </div>
     </b-form>
 
-    <ul class="list tea-list">
-      <li v-for="tea of teas" :key="tea.name">{{tea.name}}</li>
-    </ul>
+    <div class="list tea-list">
+      <div v-for="tea of teas" :key="tea.name">
+        <p class="tea-text">
+          {{tea.name}}
+        </p>
+      </div>
+    </div>
 
     <tea-editor ref="teaEditor"></tea-editor>
   </div>
