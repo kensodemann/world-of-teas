@@ -16,11 +16,8 @@
     </b-form>
 
     <div class="list tea-list">
-      <div v-for="tea of teas" :key="tea.name">
-        <p class="tea-text">
-          {{tea.name}}
-        </p>
-      </div>
+      <tea-list-item v-for="tea of teas" :key="tea.name" :tea="tea">
+      </tea-list-item>
     </div>
 
     <tea-editor ref="teaEditor"></tea-editor>
@@ -37,10 +34,12 @@
 
 <script>
 import TeaEditor from '@/components/tea-editor';
+import TeaListItem from '@/components/tea-list-item';
 
 export default {
   components: {
-    TeaEditor
+    TeaEditor,
+    TeaListItem
   },
   data() {
     return {

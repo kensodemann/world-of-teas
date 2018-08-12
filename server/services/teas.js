@@ -5,6 +5,7 @@ const database = require('../config/database');
 const columns =
   'teas.id,' +
   'teas.name,' +
+  'teas.description,' +
   'teas.tea_category_rid as "teaCategoryId",' +
   'tea_categories.name as "teaCategoryName",' +
   'teas.instructions,' +
