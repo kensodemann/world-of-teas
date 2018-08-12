@@ -49,7 +49,6 @@ export default {
   },
   computed: {
     teas() {
-      console.log('teas:', this.$store.state.teas.list);
       return this.$store.state.teas.list;
     }
   },
