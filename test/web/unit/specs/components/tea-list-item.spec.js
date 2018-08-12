@@ -4,40 +4,32 @@ import { mountComponent } from '../../util';
 describe('tea-list-item Component', async () => {
   let vm;
   beforeEach(async () => {
-    vm = await mountComponent(Component);
+    vm = await mountComponent(Component, {
+      tea: {
+        id: 30,
+        name: 'Earl Grey',
+        teaCategoryId: 2,
+        teaCategoryName: 'Black',
+        description: 'flowery tea',
+        instructions: 'do something with the tea',
+        rating: 3,
+        url: 'https://www.flower-teas.com/4231415973',
+        price: 27.42
+      }
+    });
   });
 
   it('exists', () => {
     expect(vm).to.exist;
   });
 
-  it('displays the tea name', async () => {
-    vm.tea = vm.$store.state.teas.hash[30];
+  it('displays the tea name', () => {
     const lbl = vm.$el.querySelector('.title');
-    await vm.$nextTick();
-    expect(lbl.textContent).to.equal(vm.$store.state.teas.hash[30].name);
+    expect(lbl.textContent).to.equal('Earl Grey');
   });
 
-  it('displays the rating', () => {});
-
-  it('displays the description', () => {});
-
-  // async function setInput(vm, id, value) {
-  //   const inp = vm.$el.querySelector(id);
-  //   inp.value = value;
-  //   inp.dispatchEvent(new Event('input'));
-  //   await Vue.nextTick();
-  // }
-
-  // async function setSelect(vm, id, idx) {
-  //   const sel = vm.$el.querySelector(id);
-  //   sel.selectedIndex = idx;
-  //   sel.dispatchEvent(new Event('change'));
-  //   await Vue.nextTick();
-  // }
-
-  // function getSelectIndex(vm, id) {
-  //   const sel = vm.$el.querySelector(id);
-  //   return sel.selectedIndex;
-  // }
+  it('displays the description', () => {
+    const lbl = vm.$el.querySelector('.description');
+    expect(lbl.textContent).to.equal('flowery tea');
+  });
 });
