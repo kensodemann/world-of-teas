@@ -1,5 +1,7 @@
 'use strict';
 
+const database = require('../config/database');
+
 const columns =
   'teas.id,' +
   'teas.name,' +
@@ -10,20 +12,16 @@ const columns =
 const tables =
   'teas join tea_categories on tea_categories.id = teas.tea_category_rid';
 
-module.exports = class Teas {
-  constructor(pool) {
-    this._pool = pool;
-  }
-
+class Teas {
   async getAll() {
-    const client = await this._pool.connect();
+    const client = await database.connect();
     const qres = await client.query(`select ${columns} from ${tables}`);
     client.release();
     return qres.rows;
   }
 
   async get(id) {
-    const client = await this._pool.connect();
+    const client = await database.connect();
     const qres = await client.query(
       `select ${columns} from ${tables} where teas.id = $1`,
       [id]
@@ -34,7 +32,7 @@ module.exports = class Teas {
 
   async save(tea) {
     let id = tea.id;
-    const client = await this._pool.connect();
+    const client = await database.connect();
     if (id) {
       await client.query(
         `update teas set name = $1, tea_category_rid = $2, description = $3, instructions = $4, rating = $5, url = $6, price = $7 where id = $8`,
@@ -73,7 +71,7 @@ module.exports = class Teas {
   }
 
   async delete(id) {
-    const client = await this._pool.connect();
+    const client = await database.connect();
     await client.query(`delete from tea_purchase_links where tea_rid = $1`, [
       id
     ]);
@@ -82,3 +80,5 @@ module.exports = class Teas {
     return {};
   }
 };
+
+module.exports = new Teas();

@@ -3,7 +3,7 @@
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
-module.exports = class AuthenticationService {
+class AuthenticationService {
   authenticate(req, res, next) {
     const auth = passport.authenticate('local', (err, user) => {
       if (err) {
@@ -111,3 +111,5 @@ module.exports = class AuthenticationService {
     });
   }
 };
+
+module.exports = new AuthenticationService();

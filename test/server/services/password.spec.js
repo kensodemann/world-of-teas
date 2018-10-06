@@ -1,34 +1,28 @@
 'use strict';
 
 const expect = require('chai').expect;
-const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
-const MockPool = require('../mocks/mock-pool');
+const MockClient = require('../mocks/mock-client');
 
-let Password;
-
-let mockHash = sinon.stub();
-let mockSalt = sinon.stub();
-
-class MockEncryption {
-  constructor() {
-    this.salt = mockSalt;
-    this.hash = mockHash;
-  }
-}
+const database = require('../../../server/config/database');
+const encryption = require('../../../server/services/encryption');
+const password = require('../../../server/services/password');
 
 describe('service: password', () => {
-  let password;
-  let pool;
+  let client;
   beforeEach(() => {
-    mockHash.reset();
-    mockSalt.reset();
-    pool = new MockPool();
-    Password = proxyquire('../../../server/services/password', {
-      './encryption': MockEncryption
-    });
-    password = new Password(pool);
+    sinon.stub(encryption, 'hash');
+    sinon.stub(encryption, 'salt');
+    client = new MockClient();
+    sinon.stub(database, 'connect');
+    database.connect.returns(Promise.resolve(client));
+  });
+
+  afterEach(() => {
+    encryption.hash.restore();
+    encryption.salt.restore();
+    database.connect.restore();
   });
 
   it('exists', () => {
@@ -37,8 +31,8 @@ describe('service: password', () => {
 
   describe('initialize', () => {
     beforeEach(() => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(Promise.resolve({ rows: [] }));
+      sinon.stub(client, 'query');
+      client.query.returns(Promise.resolve({ rows: [] }));
     });
 
     it('rejects if no user ID is given', async () => {
@@ -59,14 +53,13 @@ describe('service: password', () => {
       }
     });
 
-    it('connects to the pool', async () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', async () => {
       await password.initialize(42, 'shhhhhIam$ecret');
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('rejects if a password row exists for the user', async () => {
-      pool.test_client.query.returns(
+      client.query.returns(
         Promise.resolve({
           rows: [
             {
@@ -86,26 +79,26 @@ describe('service: password', () => {
     });
 
     it('salts and encrypts the password', async () => {
-      mockSalt.returns('ABD349968NACL456');
+      encryption.salt.returns('ABD349968NACL456');
       await password.initialize(42, 'IamPassw0rd');
-      expect(mockSalt.calledOnce).to.be.true;
-      expect(mockHash.calledOnce).to.be.true;
-      expect(mockHash.calledWith('ABD349968NACL456', 'IamPassw0rd')).to.be.true;
+      expect(encryption.salt.calledOnce).to.be.true;
+      expect(encryption.hash.calledOnce).to.be.true;
+      expect(encryption.hash.calledWith('ABD349968NACL456', 'IamPassw0rd')).to.be.true;
     });
 
     it('inserts the salted encrypted password', async () => {
-      mockSalt.returns('ABD349968NACL456');
-      mockHash
+      encryption.salt.returns('ABD349968NACL456');
+      encryption.hash
         .withArgs('ABD349968NACL456', 'IamPassw0rd')
         .returns('19934009599234095');
       await password.initialize(42, 'IamPassw0rd');
-      expect(pool.test_client.query.calledTwice).to.be.true;
+      expect(client.query.calledTwice).to.be.true;
       expect(
         /insert into user_credentials.*user_rid, password, salt/.test(
-          pool.test_client.query.args[1][0]
+          client.query.args[1][0]
         )
       ).to.be.true;
-      expect(pool.test_client.query.args[1][1]).to.deep.equal([
+      expect(client.query.args[1][1]).to.deep.equal([
         42,
         '19934009599234095',
         'ABD349968NACL456'
@@ -113,21 +106,21 @@ describe('service: password', () => {
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await password.initialize(73, 'coop3r');
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 
   describe('change', () => {
     beforeEach(() => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(
+      sinon.stub(client, 'query');
+      client.query.returns(
         Promise.resolve({
           rows: [{ id: 42, salt: '39949AAC43', password: 'ABBA1357CDDF' }]
         })
       );
-      mockHash.withArgs('39949AAC43', 'IamPassw0rd').returns('ABBA1357CDDF');
+      encryption.hash.withArgs('39949AAC43', 'IamPassw0rd').returns('ABBA1357CDDF');
     });
 
     it('thows an error if no user ID is given', async () => {
@@ -148,14 +141,13 @@ describe('service: password', () => {
       }
     });
 
-    it('connects to the pool', async () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', async () => {
       await password.change(42, 'shhhhhIam$ecret', 'IamPassw0rd');
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('throws an error if the current password is not valid', async () => {
-      mockHash.withArgs('39949AAC43', 'IamPassw0rd').returns('188492985AB34');
+      encryption.hash.withArgs('39949AAC43', 'IamPassw0rd').returns('188492985AB34');
       try {
         await password.change(73, 'newpassword', 'IamPassw0rd');
         expect.fail(undefined, undefined, 'should have rejected');
@@ -165,27 +157,27 @@ describe('service: password', () => {
     });
 
     it('salts and encrypts the password', async () => {
-      mockSalt.returns('3848859ADNACL456');
+      encryption.salt.returns('3848859ADNACL456');
       await password.change(42, 'shhhhhIam$ecret', 'IamPassw0rd');
-      expect(mockSalt.calledOnce).to.be.true;
-      expect(mockHash.calledTwice).to.be.true; // first time is current password check
-      expect(mockHash.calledWith('3848859ADNACL456', 'shhhhhIam$ecret')).to.be
+      expect(encryption.salt.calledOnce).to.be.true;
+      expect(encryption.hash.calledTwice).to.be.true; // first time is current password check
+      expect(encryption.hash.calledWith('3848859ADNACL456', 'shhhhhIam$ecret')).to.be
         .true;
     });
 
     it('updates to the salted encrypted password', async () => {
-      mockSalt.returns('3848859ADNACL456');
-      mockHash
+      encryption.salt.returns('3848859ADNACL456');
+      encryption.hash
         .withArgs('3848859ADNACL456', 'shhhhhIam$ecret')
         .returns('AFED9948577FFED');
       await password.change(42, 'shhhhhIam$ecret', 'IamPassw0rd');
-      expect(pool.test_client.query.calledTwice).to.be.true;
+      expect(client.query.calledTwice).to.be.true;
       expect(
         /on conflict \(user_rid\) do update/.test(
-          pool.test_client.query.args[1][0]
+          client.query.args[1][0]
         )
       ).to.be.true;
-      expect(pool.test_client.query.args[1][1]).to.deep.equal([
+      expect(client.query.args[1][1]).to.deep.equal([
         42,
         'AFED9948577FFED',
         '3848859ADNACL456'
@@ -193,9 +185,9 @@ describe('service: password', () => {
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await password.change(73, 'coop3r', 'IamPassw0rd');
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 
@@ -204,8 +196,8 @@ describe('service: password', () => {
     let clock;
     beforeEach(() => {
       clock = sinon.useFakeTimers(now);
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(
+      sinon.stub(client, 'query');
+      client.query.returns(
         Promise.resolve({
           rows: [{ user_rid: 1138, token: '39949AAC43', timestamp: now }]
         })
@@ -234,14 +226,13 @@ describe('service: password', () => {
       }
     });
 
-    it('connects to the pool', async () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', async () => {
       await password.reset(42, 'shhhhhIam$ecret', '39949AAC43');
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('throws an error if there is no token for the user', async () => {
-      pool.test_client.query.returns(Promise.resolve([]));
+      client.query.returns(Promise.resolve([]));
       clock.tick(113945);
       try {
         await password.reset(1138, 'IAmNewPassword', 'IAmToken');
@@ -274,28 +265,28 @@ describe('service: password', () => {
     });
 
     it('salts and encrypts the password', async () => {
-      mockSalt.returns('3848859ADNACL456');
+      encryption.salt.returns('3848859ADNACL456');
       clock.tick(188495);
       await password.reset(1138, 'IAmNewPassword', '39949AAC43');
-      expect(mockSalt.calledOnce).to.be.true;
-      expect(mockHash.calledOnce).to.be.true;
-      expect(mockHash.calledWith('3848859ADNACL456', 'IAmNewPassword')).to.be
+      expect(encryption.salt.calledOnce).to.be.true;
+      expect(encryption.hash.calledOnce).to.be.true;
+      expect(encryption.hash.calledWith('3848859ADNACL456', 'IAmNewPassword')).to.be
         .true;
     });
 
     it('updates to the salted encrypted password', async () => {
-      mockSalt.returns('3848859ADNACL456');
-      mockHash
+      encryption.salt.returns('3848859ADNACL456');
+      encryption.hash
         .withArgs('3848859ADNACL456', 'IAmNewPassword')
         .returns('AFED9948577FFED');
       await password.reset(1138, 'IAmNewPassword', '39949AAC43');
-      expect(pool.test_client.query.calledTwice).to.be.true;
+      expect(client.query.calledTwice).to.be.true;
       expect(
         /on conflict \(user_rid\) do update/.test(
-          pool.test_client.query.args[1][0]
+          client.query.args[1][0]
         )
       ).to.be.true;
-      expect(pool.test_client.query.args[1][1]).to.deep.equal([
+      expect(client.query.args[1][1]).to.deep.equal([
         1138,
         'AFED9948577FFED',
         '3848859ADNACL456'
@@ -303,29 +294,28 @@ describe('service: password', () => {
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await password.reset(73, 'coop3r', '39949AAC43');
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 
   describe('matches', () => {
     beforeEach(() => {
-      mockHash.withArgs('39949AAC43', 'IamPassw0rd').returns('F00BA4');
+      encryption.hash.withArgs('39949AAC43', 'IamPassw0rd').returns('F00BA4');
     });
 
-    it('connects to the pool', () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', () => {
       password.matches(42, 'shhhhhIam$ecret');
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('queries the user credentials', async () => {
-      sinon.spy(pool.test_client, 'query');
+      sinon.spy(client, 'query');
       await password.matches(42, 'IamPassw0rd');
-      expect(pool.test_client.query.calledOnce).to.be.true;
+      expect(client.query.calledOnce).to.be.true;
       expect(
-        pool.test_client.query.calledWith(
+        client.query.calledWith(
           'select * from user_credentials where user_rid = $1',
           [42]
         )
@@ -333,15 +323,15 @@ describe('service: password', () => {
     });
 
     it('resolves false if the user has no credentials record', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(Promise.resolve({ rows: [] }));
+      sinon.stub(client, 'query');
+      client.query.returns(Promise.resolve({ rows: [] }));
       const match = await password.matches(42, 'IamPassw0rd');
       expect(match).to.be.false;
     });
 
     it('resolves false if the password hashes do not match', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(
+      sinon.stub(client, 'query');
+      client.query.returns(
         Promise.resolve({
           rows: [{ id: 42, salt: '39949AAC43', password: 'ABBA1357CDDF' }]
         })
@@ -351,8 +341,8 @@ describe('service: password', () => {
     });
 
     it('resolves true if the password hashes do match', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(
+      sinon.stub(client, 'query');
+      client.query.returns(
         Promise.resolve({
           rows: [{ id: 42, salt: '39949AAC43', password: 'F00BA4' }]
         })
@@ -362,9 +352,9 @@ describe('service: password', () => {
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await password.matches(73, 'coop3r');
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 });

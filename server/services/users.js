@@ -1,24 +1,20 @@
 'use strict';
 
-const Password = require('./password');
+const database = require('../config/database');
+const password = require('./password');
 
 const columns = 'id, first_name as "firstName", last_name as "lastName", email';
 
-module.exports = class Users {
-  constructor(pool) {
-    this._pool = pool;
-    this._password = new Password(pool);
-  }
-
+class Users {
   async getAll() {
-    const client = await this._pool.connect();
+    const client = await database.connect();
     const data = await client.query(`select ${columns} from users`);
     client.release();
     return data.rows;
   }
 
   async get(id) {
-    const client = await this._pool.connect();
+    const client = await database.connect();
     const data = await (/.*@.*/.test(id)
       ? client.query(
         `select ${columns} from users where upper(email) = upper($1)`,
@@ -34,7 +30,7 @@ module.exports = class Users {
   }
 
   async save(user) {
-    const client = await this._pool.connect();
+    const client = await database.connect();
     let rtn;
     if (user.id) {
       rtn = await client.query(
@@ -47,10 +43,12 @@ module.exports = class Users {
         [user.firstName, user.lastName, user.email]
       );
       if (rtn.rows && rtn.rows[0] && rtn.rows[0].id) {
-        this._password.initialize(rtn.rows[0].id, user.password || 'password');
+        password.initialize(rtn.rows[0].id, user.password || 'password');
       }
     }
     client.release();
     return rtn.rows && rtn.rows[0];
   }
 };
+
+module.exports = new Users();

@@ -1,17 +1,16 @@
 'use strict';
 
+const database = require('../../../server/config/database');
 const expect = require('chai').expect;
-const MockPool = require('../mocks/mock-pool');
+const MockClient = require('../mocks/mock-client');
 const sinon = require('sinon');
-const Service = require('../../../server/services/tea-categories');
+const service = require('../../../server/services/tea-categories');
 
 describe('service: tea-categories', () => {
-  let pool;
-  let service;
+  let client;
   let testData;
 
   beforeEach(() => {
-    pool = new MockPool();
     testData = [
       {
         id: 1,
@@ -29,35 +28,39 @@ describe('service: tea-categories', () => {
         description: 'Not a tea'
       }
     ];
-    service = new Service(pool);
+    client = new MockClient();
+    sinon.stub(database, 'connect').resolves(client);
+  });
+
+  afterEach(() => {
+    database.connect.restore();
   });
 
   describe('getAll', () => {
-    it('connects to the pool', () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', () => {
       service.getAll();
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('queries the tea categories', async () => {
-      sinon.spy(pool.test_client, 'query');
+      sinon.spy(client, 'query');
       await service.getAll();
-      expect(pool.test_client.query.calledOnce).to.be.true;
-      expect(pool.test_client.query.calledWith('select * from tea_categories'))
-        .to.be.true;
+      expect(client.query.calledOnce).to.be.true;
+      expect(client.query.calledWith('select * from tea_categories')).to.be
+        .true;
     });
 
     it('returns the data', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(Promise.resolve({ rows: testData }));
+      sinon.stub(client, 'query');
+      client.query.returns(Promise.resolve({ rows: testData }));
       const data = await service.getAll();
       expect(data).to.deep.equal(testData);
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await service.getAll();
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 });

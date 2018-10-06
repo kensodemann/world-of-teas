@@ -45,11 +45,10 @@ describe('service: authentication', () => {
 
     beforeEach(() => {
       mockPassport = new MockPassport();
-      const Service = proxyquire('../../../server/services/authentication', {
+      service = proxyquire('../../../server/services/authentication', {
         passport: mockPassport,
         jsonwebtoken: mockJWT
       });
-      service = new Service();
     });
 
     it('calls passport authenticate', () => {
@@ -183,10 +182,9 @@ describe('service: authentication', () => {
   describe('refresh', () => {
     let service;
     beforeEach(() => {
-      const Service = proxyquire('../../../server/services/authentication', {
+      service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
-      service = new Service();
 
       mockRequest.headers = {
         authorization: 'bearer thisisarandomtokenvalue'
@@ -285,10 +283,9 @@ describe('service: authentication', () => {
   describe('isAuthenticated', () => {
     let service;
     beforeEach(() => {
-      const Service = proxyquire('../../../server/services/authentication', {
+      service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
-      service = new Service();
 
       mockRequest.headers = {
         authorization: 'bearer thisisarandomtokenvalue'
@@ -331,10 +328,9 @@ describe('service: authentication', () => {
     let service;
     let mockNext;
     beforeEach(() => {
-      const Service = proxyquire('../../../server/services/authentication', {
+      service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
-      service = new Service();
 
       mockRequest.headers = {
         authorization: 'bearer thisisarandomtokenvalue'
@@ -377,10 +373,9 @@ describe('service: authentication', () => {
     let service;
     let mockNext;
     beforeEach(() => {
-      const Service = proxyquire('../../../server/services/authentication', {
+      service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
-      service = new Service();
 
       mockRequest.headers = {
         authorization: 'bearer thisisarandomtokenvalue'
@@ -422,10 +417,9 @@ describe('service: authentication', () => {
     let service;
     let mockNext;
     beforeEach(() => {
-      const Service = proxyquire('../../../server/services/authentication', {
+      service = proxyquire('../../../server/services/authentication', {
         jsonwebtoken: mockJWT
       });
-      service = new Service();
 
       mockRequest.headers = {
         authorization: 'bearer thisisarandomtokenvalue'

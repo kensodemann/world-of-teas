@@ -1,14 +1,14 @@
 'use strict';
 
-module.exports = class TeaCategories {
-  constructor(pool) {
-    this._pool = pool;
-  }
+const database = require('../config/database');
 
+class TeaCategories {
   async getAll() {
-    const client = await this._pool.connect();
+    const client = await database.connect();
     const qres = await client.query('select * from tea_categories');
     client.release();
     return qres.rows;
   }
 };
+
+module.exports = new TeaCategories();
