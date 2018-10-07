@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS tea_categories (
   CONSTRAINT tea_categories_pk PRIMARY KEY (ID)
 );
 
-
 WITH data AS (
   SELECT 1 AS ID, 'Green' AS NAME, 'Green teas have the oxidation process stopped very early on, leaving them with a very subtle flavor and complex undertones. These teas should be steeped at lower temperatures for shorter periods of time.' AS DESCRIPTION
    UNION ALL
