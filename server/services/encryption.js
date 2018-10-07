@@ -2,7 +2,7 @@
 
 const crypto = require('crypto');
 
-module.exports = class EncryptionService {
+class EncryptionService {
   salt() {
     return crypto.randomBytes(128).toString('base64');
   }
@@ -12,3 +12,5 @@ module.exports = class EncryptionService {
     return hmac.update(password).digest('hex');
   }
 };
+
+module.exports = new EncryptionService();

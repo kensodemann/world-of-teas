@@ -1,85 +1,21 @@
 'use strict';
 
+const auth = require('../../../server/services/authentication');
 const expect = require('chai').expect;
 const express = require('express');
-const MockPool = require('../mocks/mock-pool');
-const proxyquire = require('proxyquire');
+const password = require('../../../server/services/password');
 const request = require('supertest');
 const sinon = require('sinon');
+const users = require('../../../server/services/users');
 
 describe('route: /api/users', () => {
-  let app;
-  let auth;
-  let mockJWT;
+  const app = express();
+  require('../../../server/config/express')(app);
+  require('../../../server/routes/users')(app);
+
   let testData;
 
-  let saveCalled;
-  let saveCalledWith;
-  class MockUserService {
-    getAll() {
-      return Promise.resolve(testData);
-    }
-
-    get(id) {
-      const value = testData.find(item => item.id.toString() === id.toString());
-      return Promise.resolve(value);
-    }
-
-    save(user) {
-      saveCalled++;
-      saveCalledWith = user;
-
-      if (user.id && !testData.find(item => item.id === user.id)) {
-        return Promise.resolve();
-      }
-      const value = { ...{ id: 314159 }, ...user };
-      return Promise.resolve(value);
-    }
-  }
-
-  let passwordCall;
-  let passwordError;
-  class MockPasswordService {
-    change(id, password, currentPassword) {
-      passwordCall.set('method', 'change');
-      passwordCall.set('id', id);
-      passwordCall.set('password', password);
-      passwordCall.set('currentPassword', currentPassword);
-      return passwordError
-        ? Promise.reject(new Error(passwordError))
-        : Promise.resolve();
-    }
-
-    reset(id, password, token) {
-      passwordCall.set('method', 'reset');
-      passwordCall.set('id', id);
-      passwordCall.set('password', password);
-      passwordCall.set('token', token);
-      return passwordError
-        ? Promise.reject(new Error(passwordError))
-        : Promise.resolve();
-    }
-  }
-
   beforeEach(() => {
-    mockJWT = {};
-    const AuthService = proxyquire('../../../server/services/authentication', {
-      jsonwebtoken: mockJWT
-    });
-    sinon.stub(mockJWT, 'verify');
-    mockJWT.verify.returns({
-      id: 1138,
-      firstName: 'Ted',
-      lastName: 'Senspeck',
-      roles: ['admin'],
-      iat: 'whatever',
-      exp: 19930124509912485
-    });
-    auth = new AuthService();
-
-    app = express();
-    require('../../../server/config/express')(app);
-    const pool = new MockPool();
     testData = [
       {
         id: 10,
@@ -108,15 +44,46 @@ describe('route: /api/users', () => {
         roles: ['admin']
       }
     ];
-    proxyquire('../../../server/routes/users', {
-      '../services/password': MockPasswordService,
-      '../services/users': MockUserService
-    })(app, auth, pool);
+    sinon.stub(auth, 'isAuthenticated').returns(true);
+    sinon.stub(auth, 'verifyToken').returns({
+      id: 1138,
+      firstName: 'Teddy',
+      lastName: 'Senspeck',
+      roles: ['admin'],
+      iat: 'whatever',
+      exp: 19930124509912485
+    });
+    sinon.stub(users, 'getAll').resolves(testData);
+    sinon
+      .stub(users, 'get')
+      .withArgs(1138)
+      .returns(
+        Promise.resolve({
+          id: 1138,
+          firstName: 'Teddy',
+          lastName: 'Senspeck',
+          roles: ['admin']
+        })
+      );
+    users.get.withArgs('30').resolves({
+      id: 30,
+      firstName: 'Barney',
+      lastName: 'Rubble'
+    });
+    sinon.stub(users, 'save');
+  });
+
+  afterEach(() => {
+    auth.isAuthenticated.restore();
+    auth.verifyToken.restore();
+    users.getAll.restore();
+    users.get.restore();
+    users.save.restore();
   });
 
   describe('get', () => {
     it('requires an API login', done => {
-      mockJWT.verify.throws(new Error('no loggy loggy'));
+      auth.isAuthenticated.returns(false);
       request(app)
         .get('/api/users')
         .end((err, res) => {
@@ -138,7 +105,7 @@ describe('route: /api/users', () => {
 
     describe('with "current"', () => {
       it('requires an API login', done => {
-        mockJWT.verify.throws(new Error('no loggy loggy'));
+        auth.isAuthenticated.returns(false);
         request(app)
           .get('/api/users/current')
           .end((err, res) => {
@@ -166,7 +133,7 @@ describe('route: /api/users', () => {
 
     describe('with an id', () => {
       it('requires an API login', done => {
-        mockJWT.verify.throws(new Error('no loggy loggy'));
+        auth.isAuthenticated.returns(false);
         request(app)
           .get('/api/users/30')
           .end((err, res) => {
@@ -191,7 +158,7 @@ describe('route: /api/users', () => {
       });
 
       it('returns the data if the ids match', done => {
-        mockJWT.verify.returns({
+        auth.verifyToken.returns({
           id: 30,
           firstName: 'Barney',
           lastName: 'Rubble',
@@ -213,7 +180,7 @@ describe('route: /api/users', () => {
       });
 
       it('returns 403 if user not admin and ids do not match', done => {
-        mockJWT.verify.returns({
+        auth.verifyToken.returns({
           id: 10,
           firstName: 'Fred',
           lastName: 'Flintstone',
@@ -242,14 +209,9 @@ describe('route: /api/users', () => {
   });
 
   describe('post', () => {
-    beforeEach(() => {
-      saveCalled = 0;
-      saveCalledWith = null;
-    });
-
     describe('with an id', () => {
       it('requires an API login', done => {
-        mockJWT.verify.throws(new Error('no loggy loggy'));
+        auth.isAuthenticated.returns(false);
         request(app)
           .post('/api/users/30')
           .send({
@@ -275,19 +237,21 @@ describe('route: /api/users', () => {
             email: 'barney@rubble.kings.io'
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(1);
-            expect(saveCalledWith).to.deep.equal({
-              id: 30,
-              firstName: 'Barney',
-              lastName: 'Rubble',
-              email: 'barney@rubble.kings.io'
-            });
+            expect(users.save.calledOnce).to.be.true;
+            expect(
+              users.save.calledWith({
+                id: 30,
+                firstName: 'Barney',
+                lastName: 'Rubble',
+                email: 'barney@rubble.kings.io'
+              })
+            ).to.be.true;
             done();
           });
       });
 
       it('calls the save if own user', done => {
-        mockJWT.verify.returns({
+        auth.verifyToken.returns({
           id: 30,
           firstName: 'Barney',
           lastName: 'Rubble',
@@ -304,18 +268,26 @@ describe('route: /api/users', () => {
             email: 'barney@rubble.kings.io'
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(1);
-            expect(saveCalledWith).to.deep.equal({
-              id: 30,
-              firstName: 'Barney',
-              lastName: 'Rubble',
-              email: 'barney@rubble.kings.io'
-            });
+            expect(users.save.calledOnce).to.be.true;
+            expect(
+              users.save.calledWith({
+                id: 30,
+                firstName: 'Barney',
+                lastName: 'Rubble',
+                email: 'barney@rubble.kings.io'
+              })
+            ).to.be.true;
             done();
           });
       });
 
       it('returns the saved data', done => {
+        users.save.resolves({
+          id: 30,
+          firstName: 'Barney',
+          lastName: 'Rubble',
+          email: 'barney@rubble.kings.io'
+        });
         request(app)
           .post('/api/users/30')
           .send({
@@ -346,13 +318,15 @@ describe('route: /api/users', () => {
             email: 'barney@rubble.kings.io'
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(1);
-            expect(saveCalledWith).to.deep.equal({
-              id: 30,
-              firstName: 'Barney',
-              lastName: 'Rubble',
-              email: 'barney@rubble.kings.io'
-            });
+            expect(users.save.calledOnce).to.be.true;
+            expect(
+              users.save.calledWith({
+                id: 30,
+                firstName: 'Barney',
+                lastName: 'Rubble',
+                email: 'barney@rubble.kings.io'
+              })
+            ).to.be.true;
             done();
           });
       });
@@ -374,7 +348,7 @@ describe('route: /api/users', () => {
       });
 
       it('returns 403 if not admin and not own user', done => {
-        mockJWT.verify.returns({
+        auth.verifyToken.returns({
           id: 10,
           firstName: 'Fred',
           lastName: 'Flintstone',
@@ -400,7 +374,7 @@ describe('route: /api/users', () => {
 
     describe('without an id', () => {
       it('requires an API login', done => {
-        mockJWT.verify.throws(new Error('no loggy loggy'));
+        auth.isAuthenticated.returns(false);
         request(app)
           .post('/api/users')
           .send({
@@ -424,17 +398,25 @@ describe('route: /api/users', () => {
             email: 'barney@rubble.kings.io'
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(1);
-            expect(saveCalledWith).to.deep.equal({
-              firstName: 'Barney',
-              lastName: 'Rubble',
-              email: 'barney@rubble.kings.io'
-            });
+            expect(users.save.calledOnce).to.be.true;
+            expect(
+              users.save.calledWith({
+                firstName: 'Barney',
+                lastName: 'Rubble',
+                email: 'barney@rubble.kings.io'
+              })
+            ).to.be.true;
             done();
           });
       });
 
       it('returns the saved data', done => {
+        users.save.resolves({
+          id: 314159,
+          firstName: 'Barney',
+          lastName: 'Rubble',
+          email: 'barney@rubble.kings.io'
+        });
         request(app)
           .post('/api/users')
           .send({
@@ -464,18 +446,20 @@ describe('route: /api/users', () => {
             email: 'barney@rubble.kings.io'
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(1);
-            expect(saveCalledWith).to.deep.equal({
-              firstName: 'Barney',
-              lastName: 'Rubble',
-              email: 'barney@rubble.kings.io'
-            });
+            expect(users.save.calledOnce).to.be.true;
+            expect(
+              users.save.calledWith({
+                firstName: 'Barney',
+                lastName: 'Rubble',
+                email: 'barney@rubble.kings.io'
+              })
+            ).to.be.true;
             done();
           });
       });
 
       it('returns 403 if not admin', done => {
-        mockJWT.verify.returns({
+        auth.verifyToken.returns({
           id: 10,
           firstName: 'Fred',
           lastName: 'Flintstone',
@@ -501,12 +485,15 @@ describe('route: /api/users', () => {
 
   describe('post change password', () => {
     beforeEach(() => {
-      passwordCall = new Map();
-      passwordError = undefined;
+      sinon.stub(password, 'change');
+    });
+
+    afterEach(() => {
+      password.change.restore();
     });
 
     it('requires an API login', done => {
-      mockJWT.verify.throws(new Error('no loggy loggy'));
+      auth.isAuthenticated.returns(false);
       request(app)
         .post('/api/users/30/password')
         .send({
@@ -528,12 +515,14 @@ describe('route: /api/users', () => {
           currentPassword: 'iAmCurr3ntPassw0rd'
         })
         .end((err, res) => {
-          expect(passwordCall.get('method')).to.equal('change');
-          expect(passwordCall.get('id')).to.equal('30');
-          expect(passwordCall.get('password')).to.equal('IamNewPa$$worD');
-          expect(passwordCall.get('currentPassword')).to.equal(
-            'iAmCurr3ntPassw0rd'
-          );
+          expect(password.change.calledOnce).to.be.true;
+          expect(
+            password.change.calledWith(
+              '30',
+              'IamNewPa$$worD',
+              'iAmCurr3ntPassw0rd'
+            )
+          ).to.be.true;
           done();
         });
     });
@@ -552,7 +541,7 @@ describe('route: /api/users', () => {
     });
 
     it('returns 400 on current password invalid', done => {
-      passwordError = 'Invalid password';
+      password.change.rejects(new Error('Invalid password'));
       request(app)
         .post('/api/users/30/password')
         .send({
@@ -567,7 +556,7 @@ describe('route: /api/users', () => {
     });
 
     it('returns 500 on unknown failure', done => {
-      passwordError = 'The database went stupid on us';
+      password.change.rejects(new Error('The database went stupid on us'));
       request(app)
         .post('/api/users/30/password')
         .send({
@@ -589,7 +578,7 @@ describe('route: /api/users', () => {
             password: 'IamNewPa$$worD'
           })
           .end((err, res) => {
-            expect(passwordCall.get('method')).to.be.undefined;
+            expect(password.change.called).to.be.false;
             done();
           });
       });
@@ -615,7 +604,7 @@ describe('route: /api/users', () => {
             currentPassword: 'iAmCurr3ntPassw0rd'
           })
           .end((err, res) => {
-            expect(passwordCall.get('method')).to.be.undefined;
+            expect(password.change.called).to.be.false;
             done();
           });
       });
@@ -634,7 +623,7 @@ describe('route: /api/users', () => {
     });
 
     it('returns 403 if not admin and not own user', done => {
-      mockJWT.verify.returns({
+      auth.verifyToken.returns({
         id: 10,
         firstName: 'Fred',
         lastName: 'Flintstone',
@@ -658,8 +647,11 @@ describe('route: /api/users', () => {
 
   describe('post reset password', () => {
     beforeEach(() => {
-      passwordCall = new Map();
-      passwordError = undefined;
+      sinon.stub(password, 'reset');
+    });
+
+    afterEach(() => {
+      password.reset.restore();
     });
 
     it('calls reset', done => {
@@ -669,10 +661,14 @@ describe('route: /api/users', () => {
           password: 'IamNewPa$$worD'
         })
         .end((err, res) => {
-          expect(passwordCall.get('method')).to.equal('reset');
-          expect(passwordCall.get('id')).to.equal('30');
-          expect(passwordCall.get('password')).to.equal('IamNewPa$$worD');
-          expect(passwordCall.get('token')).to.equal('38849950394ADEF45CF');
+          expect(password.reset.calledOnce).to.be.true;
+          expect(
+            password.reset.calledWith(
+              '30',
+              'IamNewPa$$worD',
+              '38849950394ADEF45CF'
+            )
+          ).to.be.true;
           done();
         });
     });
@@ -690,7 +686,7 @@ describe('route: /api/users', () => {
     });
 
     it('returns 400 on invalid token', done => {
-      passwordError = 'Invalid token';
+      password.reset.rejects(new Error('Invalid token'));
       request(app)
         .post('/api/users/30/password/38849950394ADEF45CF')
         .send({
@@ -703,7 +699,7 @@ describe('route: /api/users', () => {
     });
 
     it('returns 400 on expired token', done => {
-      passwordError = 'Expired token';
+      password.reset.rejects(new Error('Expired token'));
       request(app)
         .post('/api/users/30/password/38849950394ADEF45CF')
         .send({
@@ -720,14 +716,14 @@ describe('route: /api/users', () => {
         .post('/api/users/30/password/38849950394ADEF45CF')
         .send({})
         .end((err, res) => {
-          expect(passwordCall.get('method')).to.be.undefined;
+          expect(password.reset.called).to.be.false;
           expect(res.status).to.equal(400);
           done();
         });
     });
 
     it('returns 500 on unknown failure', done => {
-      passwordError = 'The database went stupid on us';
+      password.reset.rejects('The database went stupid on us');
       request(app)
         .post('/api/users/30/password/38849950394ADEF45CF')
         .send({

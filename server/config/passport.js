@@ -2,13 +2,10 @@
 
 const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
-const Password = require('../services/password');
-const Users = require('../services/users');
+const password = require('../services/password');
+const users = require('../services/users');
 
-module.exports = (pool) => {
-  const password = new Password(pool);
-  const users = new Users(pool);
-
+module.exports = () => {
   passport.use(
     new LocalStrategy(function(username, passwd, done) {
       (async () => {

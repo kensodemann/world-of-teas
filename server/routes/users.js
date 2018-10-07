@@ -1,12 +1,11 @@
 'use strict';
 
-const PasswordService = require('../services/password');
+const auth = require('../services/authentication');
+const password = require('../services/password');
 const Repository = require('./repository');
-const UsersService = require('../services/users');
+const users = require('../services/users');
 
-module.exports = (app, auth, pool) => {
-  const password = new PasswordService(pool);
-  const users = new UsersService(pool);
+module.exports = (app) => {
   const userRepo = new Repository(users);
 
   app.get(

@@ -1,17 +1,16 @@
 'use strict';
 
+const database = require('../../../server/config/database');
 const expect = require('chai').expect;
-const MockPool = require('../mocks/mock-pool');
+const MockClient = require('../mocks/mock-client');
 const sinon = require('sinon');
-const Service = require('../../../server/services/teas');
+const service = require('../../../server/services/teas');
 
 describe('service: teas', () => {
-  let pool;
-  let service;
+  let client;
   let testData;
 
   beforeEach(() => {
-    pool = new MockPool();
     testData = [
       {
         id: 1,
@@ -29,21 +28,25 @@ describe('service: teas', () => {
         description: 'Not a tea'
       }
     ];
-    service = new Service(pool);
+    client = new MockClient();
+    sinon.stub(database, 'connect').resolves(client);
+  });
+
+  afterEach(() => {
+    database.connect.restore();
   });
 
   describe('getAll', () => {
-    it('connects to the pool', () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', () => {
       service.getAll();
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('queries the teas', async () => {
-      sinon.spy(pool.test_client, 'query');
+      sinon.spy(client, 'query');
       await service.getAll();
-      expect(pool.test_client.query.calledOnce).to.be.true;
-      const args = pool.test_client.query.args[0];
+      expect(client.query.calledOnce).to.be.true;
+      const args = client.query.args[0];
       expect(
         /select .* from teas join tea_categories on tea_categories.id = teas.tea_category_rid/.test(
           args[0]
@@ -52,45 +55,44 @@ describe('service: teas', () => {
     });
 
     it('returns the data', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(Promise.resolve({ rows: testData }));
+      sinon.stub(client, 'query');
+      client.query.returns(Promise.resolve({ rows: testData }));
       const data = await service.getAll();
       expect(data).to.deep.equal(testData);
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await service.getAll();
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 
   describe('get', () => {
-    it('connects to the pool', () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', () => {
       service.get(42);
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await service.get(42);
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
 
     it('queries the teas for the tea with the given ID', async () => {
-      sinon.spy(pool.test_client, 'query');
+      sinon.spy(client, 'query');
       await service.get(42);
-      expect(pool.test_client.query.calledOnce).to.be.true;
-      const args = pool.test_client.query.args[0];
+      expect(client.query.calledOnce).to.be.true;
+      const args = client.query.args[0];
       expect(/select .* from teas .* where teas\.id = \$1/.test(args[0])).to.be
         .true;
       expect(args[1]).to.deep.equal([42]);
     });
 
     it('resolves the data', async () => {
-      sinon.stub(pool.test_client, 'query');
-      pool.test_client.query.returns(
+      sinon.stub(client, 'query');
+      client.query.returns(
         Promise.resolve({
           rows: [
             {
@@ -115,15 +117,14 @@ describe('service: teas', () => {
   });
 
   describe('save', () => {
-    it('connects to the pool', () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', () => {
       service.save({});
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     describe('with an ID', () => {
       it('updates the given tea', async () => {
-        sinon.spy(pool.test_client, 'query');
+        sinon.spy(client, 'query');
         await service.save({
           id: 42,
           name: 'Monkey Picked Oolong',
@@ -131,19 +132,19 @@ describe('service: teas', () => {
           teaCategoryName: 'Oolong',
           description: 'Good quality basic oolong tea'
         });
-        expect(pool.test_client.query.calledTwice).to.be.true;
-        let args = pool.test_client.query.args[0];
+        expect(client.query.calledTwice).to.be.true;
+        let args = client.query.args[0];
         expect(/update teas .*/.test(args[0])).to.be.true;
 
-        args = pool.test_client.query.args[1];
+        args = client.query.args[1];
         expect(/select .* from teas .* where teas\.id = \$1/.test(args[0])).to
           .be.true;
         expect(args[1]).to.deep.equal([42]);
       });
 
       it('returns the updated tea', async () => {
-        sinon.stub(pool.test_client, 'query');
-        pool.test_client.query.returns(
+        sinon.stub(client, 'query');
+        client.query.returns(
           Promise.resolve({
             rows: [
               {
@@ -175,13 +176,13 @@ describe('service: teas', () => {
 
     describe('without an ID', () => {
       beforeEach(() => {
-        sinon.stub(pool.test_client, 'query');
-        pool.test_client.query.onCall(0).returns(
+        sinon.stub(client, 'query');
+        client.query.onCall(0).returns(
           Promise.resolve({
             rows: [{ id: 1138 }]
           })
         );
-        pool.test_client.query.onCall(1).returns(
+        client.query.onCall(1).returns(
           Promise.resolve({
             rows: [
               {
@@ -203,11 +204,11 @@ describe('service: teas', () => {
           teaCategoryName: 'Oolong',
           description: 'Good quality basic oolong tea'
         });
-        expect(pool.test_client.query.calledTwice).to.be.true;
-        let args = pool.test_client.query.args[0];
+        expect(client.query.calledTwice).to.be.true;
+        let args = client.query.args[0];
         expect(/insert into teas .* returning id/.test(args[0])).to.be.true;
 
-        args = pool.test_client.query.args[1];
+        args = client.query.args[1];
         expect(/select .* from teas .* where teas\.id = \$1/.test(args[0])).to
           .be.true;
         expect(args[1]).to.deep.equal([1138]);
@@ -231,38 +232,37 @@ describe('service: teas', () => {
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await service.save({});
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 
   describe('delete', () => {
-    it('connects to the pool', () => {
-      sinon.spy(pool, 'connect');
+    it('connects to the database', () => {
       service.delete(42);
-      expect(pool.connect.calledOnce).to.be.true;
+      expect(database.connect.calledOnce).to.be.true;
     });
 
     it('deletes the tea with the given ID', async () => {
-      sinon.spy(pool.test_client, 'query');
+      sinon.spy(client, 'query');
       await service.delete(42);
-      expect(pool.test_client.query.calledTwice).to.be.true;
+      expect(client.query.calledTwice).to.be.true;
 
-      let args = pool.test_client.query.args[0];
+      let args = client.query.args[0];
       expect(/delete from tea_purchase_links where tea_rid = \$1/.test(args[0]))
         .to.be.true;
       expect(args[1]).to.deep.equal([42]);
 
-      args = pool.test_client.query.args[1];
+      args = client.query.args[1];
       expect(/delete from teas where id = \$1/.test(args[0])).to.be.true;
       expect(args[1]).to.deep.equal([42]);
     });
 
     it('releases the client', async () => {
-      sinon.spy(pool.test_client, 'release');
+      sinon.spy(client, 'release');
       await service.delete(42);
-      expect(pool.test_client.release.calledOnce).to.be.true;
+      expect(client.release.calledOnce).to.be.true;
     });
   });
 });

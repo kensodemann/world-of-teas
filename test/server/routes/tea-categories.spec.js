@@ -1,41 +1,19 @@
 'use strict';
 
+const auth = require('../../../server/services/authentication');
 const expect = require('chai').expect;
 const express = require('express');
-const MockPool = require('../mocks/mock-pool');
-const proxyquire = require('proxyquire');
 const request = require('supertest');
 const sinon = require('sinon');
+const teaCategories = require('../../../server/services/tea-categories');
 
 describe('route: /api/tea-categories', () => {
-  let app;
+  const app = express();
+  require('../../../server/config/express')(app);
+  require('../../../server/routes/tea-categories')(app);
   let testData;
 
-  class MockTeaCategoryService {
-    getAll() {
-      return Promise.resolve(testData);
-    }
-  }
-
   beforeEach(() => {
-    const mockJWT = {};
-    const AuthService = proxyquire('../../../server/services/authentication', {
-      jsonwebtoken: mockJWT
-    });
-    sinon.stub(mockJWT, 'verify');
-    mockJWT.verify.returns({
-      id: 1138,
-      firstName: 'Ted',
-      lastName: 'Senspeck',
-      roles: ['admin'],
-      iat: 'whatever',
-      exp: 19930124509912485
-    });
-    const auth = new AuthService();
-
-    app = express();
-    require('../../../server/config/express')(app);
-    const pool = new MockPool();
     testData = [
       {
         id: 1,
@@ -53,12 +31,22 @@ describe('route: /api/tea-categories', () => {
         description: 'Not a tea'
       }
     ];
-    proxyquire('../../../server/routes/tea-categories', {
-      '../services/tea-categories': MockTeaCategoryService
-    })(app, auth, pool);
+    sinon.stub(auth, 'isAuthenticated').returns(true);
+  });
+
+  afterEach(() => {
+    auth.isAuthenticated.restore();
   });
 
   describe('get', () => {
+    beforeEach(() => {
+      sinon.stub(teaCategories, 'getAll').resolves(testData);
+    });
+
+    afterEach(() => {
+      teaCategories.getAll.restore();
+    });
+
     it('returns the data', done => {
       request(app)
         .get('/api/tea-categories')

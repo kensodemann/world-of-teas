@@ -1,69 +1,20 @@
 'use strict';
 
+const auth = require('../../../server/services/authentication');
 const expect = require('chai').expect;
 const express = require('express');
-const MockPool = require('../mocks/mock-pool');
-const proxyquire = require('proxyquire');
 const request = require('supertest');
 const sinon = require('sinon');
+const teas = require('../../../server/services/teas');
 
 describe('route: /api/teas', () => {
-  let app;
-  let auth;
-  let mockJWT;
+  const app = express();
+  require('../../../server/config/express')(app);
+  require('../../../server/routes/teas')(app);
+
   let testData;
 
-  let deleteCalled;
-  let deleteCalledWith;
-  let saveCalled;
-  let saveCalledWith;
-  class MockTeaService {
-    getAll() {
-      return Promise.resolve(testData);
-    }
-
-    get(id) {
-      const value = testData.find(item => item.id.toString() === id.toString());
-      return Promise.resolve(value);
-    }
-
-    save(tea) {
-      saveCalled++;
-      saveCalledWith = tea;
-
-      if (tea.id && !testData.find(item => item.id === tea.id)) {
-        return Promise.resolve();
-      }
-      const value = { ...{ id: 314159 }, ...tea };
-      return Promise.resolve(value);
-    }
-
-    delete(id) {
-      deleteCalled++;
-      deleteCalledWith = id;
-      return Promise.resolve({});
-    }
-  }
-
   beforeEach(() => {
-    mockJWT = {};
-    const AuthService = proxyquire('../../../server/services/authentication', {
-      jsonwebtoken: mockJWT
-    });
-    sinon.stub(mockJWT, 'verify');
-    mockJWT.verify.returns({
-      id: 1138,
-      firstName: 'Ted',
-      lastName: 'Senspeck',
-      roles: ['user'],
-      iat: 'whatever',
-      exp: 19930124509912485
-    });
-    auth = new AuthService();
-
-    app = express();
-    require('../../../server/config/express')(app);
-    const pool = new MockPool();
     testData = [
       {
         id: 10,
@@ -112,17 +63,32 @@ describe('route: /api/teas', () => {
         rating: 4
       }
     ];
-    proxyquire('../../../server/routes/teas', {
-      '../services/teas': MockTeaService
-    })(app, auth, pool);
+    sinon.stub(auth, 'isAuthenticated').returns(true);
+  });
+
+  afterEach(() => {
+    auth.isAuthenticated.restore();
   });
 
   describe('get', () => {
+    beforeEach(() => {
+      sinon.stub(teas, 'getAll').resolves(testData);
+      sinon
+        .stub(teas, 'get')
+        .withArgs('30')
+        .resolves(testData[2]);
+    });
+
+    afterEach(() => {
+      teas.getAll.restore();
+      teas.get.restore();
+    });
+
     registerGetTests();
 
     describe('when not logged in', () => {
       beforeEach(() => {
-        mockJWT.verify.throws(new Error('no loggy loggy'));
+        auth.isAuthenticated.returns(false);
       });
 
       registerGetTests();
@@ -172,13 +138,16 @@ describe('route: /api/teas', () => {
 
   describe('post', () => {
     beforeEach(() => {
-      saveCalled = 0;
-      saveCalledWith = null;
+      sinon.stub(teas, 'save');
+    });
+
+    afterEach(() => {
+      teas.save.restore();
     });
 
     describe('without an id', () => {
       it('requires an API login', done => {
-        mockJWT.verify.throws(new Error('no loggy loggy'));
+        auth.isAuthenticated.returns(false);
         request(app)
           .post('/api/teas')
           .send({
@@ -190,7 +159,7 @@ describe('route: /api/teas', () => {
             rating: 2
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(0);
+            expect(teas.save.called).to.be.false;
             expect(res.status).to.equal(401);
             expect(res.body).to.deep.equal({});
             done();
@@ -210,15 +179,17 @@ describe('route: /api/teas', () => {
             rating: 2
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(1);
-            expect(saveCalledWith).to.deep.equal({
-              name: 'Grassy Green',
-              teaCategoryId: 1,
-              teaCategoryName: 'Green',
-              description: 'something about the tea',
-              instructions: 'do something with the tea',
-              rating: 2
-            });
+            expect(teas.save.calledOnce).to.be.true;
+            expect(
+              teas.save.calledWith({
+                name: 'Grassy Green',
+                teaCategoryId: 1,
+                teaCategoryName: 'Green',
+                description: 'something about the tea',
+                instructions: 'do something with the tea',
+                rating: 2
+              })
+            ).to.be.true;
             done();
           });
       });
@@ -226,7 +197,7 @@ describe('route: /api/teas', () => {
 
     describe('with an id', () => {
       it('requires an API login', done => {
-        mockJWT.verify.throws(new Error('no loggy loggy'));
+        auth.isAuthenticated.returns(false);
         request(app)
           .post('/api/teas/30')
           .send({
@@ -239,7 +210,7 @@ describe('route: /api/teas', () => {
             rating: 2
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(0);
+            expect(teas.save.called).to.be.false;
             expect(res.status).to.equal(401);
             expect(res.body).to.deep.equal({});
             done();
@@ -259,16 +230,18 @@ describe('route: /api/teas', () => {
             rating: 2
           })
           .end((err, res) => {
-            expect(saveCalled).to.equal(1);
-            expect(saveCalledWith).to.deep.equal({
-              id: 30,
-              name: 'Grassy Green',
-              teaCategoryId: 1,
-              teaCategoryName: 'Green',
-              description: 'something about the tea',
-              instructions: 'do something with the tea',
-              rating: 2
-            });
+            expect(teas.save.calledOnce).to.be.true;
+            expect(
+              teas.save.calledWith({
+                id: 30,
+                name: 'Grassy Green',
+                teaCategoryId: 1,
+                teaCategoryName: 'Green',
+                description: 'something about the tea',
+                instructions: 'do something with the tea',
+                rating: 2
+              })
+            ).to.be.true;
             done();
           });
       });
@@ -277,17 +250,20 @@ describe('route: /api/teas', () => {
 
   describe('delete', () => {
     beforeEach(() => {
-      deleteCalled = 0;
-      deleteCalledWith = null;
+      sinon.stub(teas, 'delete');
+    });
+
+    afterEach(() => {
+      teas.delete.restore();
     });
 
     it('requires an API login', done => {
-      mockJWT.verify.throws(new Error('no loggy loggy'));
+      auth.isAuthenticated.returns(false);
       request(app)
         .delete('/api/teas/30')
         .send({})
         .end((err, res) => {
-          expect(deleteCalled).to.equal(0);
+          expect(teas.delete.called).to.be.false;
           expect(res.status).to.equal(401);
           expect(res.body).to.deep.equal({});
           done();
@@ -299,8 +275,8 @@ describe('route: /api/teas', () => {
         .delete('/api/teas/30')
         .send({})
         .end((err, res) => {
-          expect(deleteCalled).to.equal(1);
-          expect(deleteCalledWith).to.equal(30);
+          expect(teas.delete.calledOnce).to.be.true;
+          expect(teas.delete.calledWith(30)).to.be.true;
           done();
         });
     });

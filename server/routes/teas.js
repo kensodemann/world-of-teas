@@ -1,10 +1,10 @@
 'use strict';
 
+const auth = require('../services/authentication');
 const Repository = require('./repository');
-const TeasService = require('../services/teas');
+const teas = require('../services/teas');
 
-module.exports = (app, auth, pool) => {
-  const teas = new TeasService(pool);
+module.exports = app => {
   const repository = new Repository(teas);
 
   app.get('/api/teas', (req, res) => {
