@@ -35,11 +35,8 @@ class AuthenticationService {
   }
 
   refresh(req, res) {
-    try {
-      this._refreshToken(req, res);
-    } catch (err) {
-      res.send({ success: false });
-    }
+    const user = this._getUser(req);
+    user ? this._refreshToken(user, res) : res.send({ success: false });
   }
 
   requireApiLogin(req, res, next) {
@@ -53,7 +50,7 @@ class AuthenticationService {
 
   requireRole(role) {
     return (req, res, next) => {
-      const user = this.verifyToken(req);
+      const user = this._getUser(req);
       if (user.roles.find(r => r === role)) {
         next();
       } else {
@@ -65,8 +62,11 @@ class AuthenticationService {
 
   requireRoleOrId(role) {
     return (req, res, next) => {
-      const user = this.verifyToken(req);
-      if (user.id.toString() === req.params.id || user.roles.find(r => r === role)) {
+      const user = this._getUser(req);
+      if (
+        user.id.toString() === req.params.id ||
+        user.roles.find(r => r === role)
+      ) {
         next();
       } else {
         res.status(403);
@@ -76,12 +76,7 @@ class AuthenticationService {
   }
 
   isAuthenticated(req) {
-    try {
-      this.verifyToken(req);
-    } catch (err) {
-      return false;
-    }
-    return true;
+    return !!this._getUser(req);
   }
 
   verifyToken(req) {
@@ -99,8 +94,13 @@ class AuthenticationService {
     return req.headers.authorization && req.headers.authorization.split(' ')[1];
   }
 
-  _refreshToken(req, res) {
-    let user = this.verifyToken(req);
+  _getUser(req) {
+    try {
+      return this.verifyToken(req);
+    } catch (err) {}
+  }
+
+  _refreshToken(user, res) {
     delete user.exp;
     delete user.iat;
     const token = this._generateToken(user);
@@ -110,6 +110,6 @@ class AuthenticationService {
       token: token
     });
   }
-};
+}
 
 module.exports = new AuthenticationService();
