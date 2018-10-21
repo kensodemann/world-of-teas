@@ -11,7 +11,7 @@ const users = require('../../../server/services/users');
 describe('route: /api/users', () => {
   const app = express();
   require('../../../server/config/express')(app);
-  require('../../../server/routes/users')(app);
+  require('../../../server/config/routes')(app);
 
   let testData;
 

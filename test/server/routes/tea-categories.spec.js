@@ -10,7 +10,7 @@ const teaCategories = require('../../../server/services/tea-categories');
 describe('route: /api/tea-categories', () => {
   const app = express();
   require('../../../server/config/express')(app);
-  require('../../../server/routes/tea-categories')(app);
+  require('../../../server/config/routes')(app);
   let testData;
 
   beforeEach(() => {

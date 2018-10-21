@@ -10,7 +10,7 @@ const teas = require('../../../server/services/teas');
 describe('route: /api/teas', () => {
   const app = express();
   require('../../../server/config/express')(app);
-  require('../../../server/routes/teas')(app);
+  require('../../../server/config/routes')(app);
 
   let testData;
 
