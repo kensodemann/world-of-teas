@@ -5,6 +5,7 @@ const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 
 const password = require('../../../server/services/password');
+const sessions = require('../../../server/services/sessions');
 const users = require('../../../server/services/users');
 
 class MockLocalStrategy {
@@ -94,30 +95,55 @@ describe('config: passport', () => {
         expect(password.matches.calledWith(1138, 'secretSauc3')).to.be.true;
       });
 
-      it('calls done with false if the password does not match', done => {
-        password.matches.resolves(false);
-        passport.strategy.authenticate(
-          'kws@email.com',
-          'secretSauc3',
-          (err, value) => {
-            expect(err).to.equal(null);
-            expect(value).to.be.false;
-            done();
-          }
-        );
+      describe('when the password does not match', () => {
+        it('calls "done" with false', done => {
+          password.matches.resolves(false);
+          passport.strategy.authenticate(
+            'kws@email.com',
+            'secretSauc3',
+            (err, value) => {
+              expect(err).to.equal(null);
+              expect(value).to.be.false;
+              done();
+            }
+          );
+        });
       });
 
-      it('calls done with uesr if the password does match', done => {
-        password.matches.resolves(true);
-        passport.strategy.authenticate(
-          'kws@email.com',
-          'secretSauc3',
-          (err, value) => {
-            expect(err).to.equal(null);
-            expect(value).to.deep.equal(returnedUser);
-            done();
-          }
-        );
+      describe('when the password matches', () => {
+        beforeEach(() => {
+          sinon.stub(sessions, 'start').resolves(420);
+        });
+
+        afterEach(() => {
+          sessions.start.restore();
+        });
+
+        it('gets a sessions ID', done => {
+          password.matches.resolves(true);
+          passport.strategy.authenticate(
+            'kws@email.com',
+            'secretSauc3',
+            (err, value) => {
+              expect(sessions.start.calledOnce).to.be.true;
+              expect(sessions.start.calledWith(1138)).to.be.true;
+              done();
+            }
+          );
+        });
+
+        it('calls done with the updated user', done => {
+          password.matches.resolves(true);
+          passport.strategy.authenticate(
+            'kws@email.com',
+            'secretSauc3',
+            (err, value) => {
+              expect(err).to.equal(null);
+              expect(value).to.deep.equal({ sessionId: 420, ...returnedUser });
+              done();
+            }
+          );
+        });
       });
     });
   });
