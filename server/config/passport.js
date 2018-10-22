@@ -3,6 +3,7 @@
 const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
 const password = require('../services/password');
+const sessions = require('../services/sessions');
 const users = require('../services/users');
 
 module.exports = () => {
@@ -11,7 +12,8 @@ module.exports = () => {
       (async () => {
         const user = await users.get(username);
         if (user && (await password.matches(user.id, passwd))) {
-          done(null, user);
+          const sessionId = await sessions.start(user.id);
+          done(null, { sessionId: sessionId, ...user });
         } else {
           done(null, false);
         }
